@@ -8,10 +8,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
-public class NotificationsUI extends BaseUI {
+public class NotificationsUI extends NavigateUI {
 
     public NotificationsUI() {
-        super("Notifications");
+
         initializeUI();
     }
 
@@ -79,5 +79,11 @@ public class NotificationsUI extends BaseUI {
             timeElapsed.append(minutesBetween).append(" minute").append(minutesBetween > 1 ? "s" : "");
         }
         return timeElapsed.toString();
+    }
+    protected void openProfileUI() {
+        // Open InstagramProfileUI frame
+        this.dispose();
+        InstagramProfileUI profileUI = new InstagramProfileUI();
+        profileUI.setVisible(true);
     }
 }

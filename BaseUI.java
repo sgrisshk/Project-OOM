@@ -12,8 +12,7 @@ public abstract class BaseUI extends JFrame {
     private static final int IMAGE_SIZE = WIDTH / 3; // Size for each image in the grid
 
 
-    public BaseUI(String title) {
-        setTitle(title);
+    public BaseUI() {
         setSize(WIDTH, HEIGHT);
         setMinimumSize(new Dimension(WIDTH, HEIGHT));
         setDefaultCloseOperation(EXIT_ON_CLOSE);
