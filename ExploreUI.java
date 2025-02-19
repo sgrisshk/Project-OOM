@@ -21,11 +21,6 @@ public class ExploreUI extends BaseUI {
     private static final int IMAGE_SIZE = WIDTH / 3; // Size for each image in the grid
 
     public ExploreUI() {
-        super("Explore");
-        initializeUI();
-    }
-
-    private void initializeUI() {
         getContentPane().removeAll();
         setLayout(new BorderLayout());
 
