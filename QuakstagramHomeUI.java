@@ -146,17 +146,8 @@ public class QuakstagramHomeUI extends JFrame {
             JLabel likesLabel = new JLabel(postData[2]);
             likesLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            JButton likeButton = new JButton("❤");
-            likeButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-            likeButton.setBackground(LIKE_BUTTON_COLOR); // Set the background color for the like button
-            likeButton.setOpaque(true);
-            likeButton.setBorderPainted(false); // Remove border
-            likeButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    handleLikeAction(imageId, likesLabel);
-                }
-            });
+
+             JButton likeButton = getjButton(postData, imageId, likesLabel);
 
             itemPanel.add(nameLabel);
             itemPanel.add(imageLabel);
@@ -244,21 +235,11 @@ private void handleLikeAction(String imageId, JLabel likesLabel) {
 
     
 private String[][] createSampleData() {
-    String currentUser = "";
-    try (BufferedReader reader = Files.newBufferedReader(Paths.get("data", "users.txt"))) {
-        String line = reader.readLine();
-        if (line != null) {
-            currentUser = line.split(":")[0].trim();
-        }
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
-
     String followedUsers = "";
     try (BufferedReader reader = Files.newBufferedReader(Paths.get("data", "following.txt"))) {
         String line;
         while ((line = reader.readLine()) != null) {
-            if (line.startsWith(currentUser + ":")) {
+            if (line.startsWith(readUserName() + ":")) {
                 followedUsers = line.split(":")[1].trim();
                 break;
             }
@@ -335,19 +316,8 @@ private String[][] createSampleData() {
         userName.setFont(new Font("Arial", Font.BOLD, 18));
         userPanel.add(userName);//User Name
 
-           JButton likeButton = new JButton("❤");
-            likeButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-            likeButton.setBackground(LIKE_BUTTON_COLOR); // Set the background color for the like button
-            likeButton.setOpaque(true);
-            likeButton.setBorderPainted(false); // Remove border
-            likeButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                   handleLikeAction(imageId, likesLabel); // Update this line
-                   refreshDisplayImage(postData, imageId); // Refresh the view
-                }
-            });
-       
+        JButton likeButton = getjButton(postData, imageId, likesLabel);
+
         // Information panel at the bottom
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
@@ -358,12 +328,28 @@ private String[][] createSampleData() {
         imageViewPanel.add(fullSizeImageLabel, BorderLayout.CENTER);
         imageViewPanel.add(infoPanel, BorderLayout.SOUTH);
         imageViewPanel.add(userPanel,BorderLayout.NORTH);
-            
+
         imageViewPanel.revalidate();
         imageViewPanel.repaint();
 
 
         cardLayout.show(cardPanel, "ImageView"); // Switch to the image view
+    }
+
+    private JButton getjButton(String[] postData, String imageId, JLabel likesLabel) {
+        JButton likeButton = new JButton("❤");
+        likeButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+        likeButton.setBackground(LIKE_BUTTON_COLOR); // Set the background color for the like button
+        likeButton.setOpaque(true);
+        likeButton.setBorderPainted(false); // Remove border
+        likeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               handleLikeAction(imageId, likesLabel); // Update this line
+               refreshDisplayImage(postData, imageId); // Refresh the view
+            }
+        });
+        return likeButton;
     }
 
     private void refreshDisplayImage(String[] postData, String imageId) {
@@ -412,20 +398,23 @@ private String[][] createSampleData() {
     private void openProfileUI() {
         // Open InstagramProfileUI frame
         this.dispose();
-        String loggedInUsername = "";
- 
-         // Read the logged-in user's username from users.txt
-     try (BufferedReader reader = Files.newBufferedReader(Paths.get("data", "users.txt"))) {
-         String line = reader.readLine();
-         if (line != null) {
-             loggedInUsername = line.split(":")[0].trim();
-         }
-     } catch (IOException e) {
-         e.printStackTrace();
-     }
-      User user = new User(loggedInUsername);
+
+      User user = new User(readUserName());
         InstagramProfileUI profileUI = new InstagramProfileUI(user);
         profileUI.setVisible(true);
+    }
+
+    private String readUserName(){
+        String username = "";
+        try (BufferedReader reader = Files.newBufferedReader(Paths.get("data", "users.txt"))) {
+            String line = reader.readLine();
+            if (line != null) {
+                username = line.split(":")[0].trim();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return username;
     }
  
      private void notificationsUI() {
