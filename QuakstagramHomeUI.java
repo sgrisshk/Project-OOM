@@ -19,6 +19,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 
 public class QuakstagramHomeUI extends JFrame {
     private static final int WIDTH = 300;
@@ -293,20 +295,17 @@ private String[][] createSampleData() {
     private void displayImage(String[] postData) {
         imageViewPanel.removeAll(); // Clear previous content
 
-       
         String imageId = new File(postData[3]).getName().split("\\.")[0];
         JLabel likesLabel = new JLabel(postData[2]); // Update this line
 
-
-
-        // Display the image
         JLabel fullSizeImageLabel = new JLabel();
         fullSizeImageLabel.setHorizontalAlignment(JLabel.CENTER);
       
 
          try {
                 BufferedImage originalImage = ImageIO.read(new File(postData[3]));
-                BufferedImage croppedImage = originalImage.getSubimage(0, 0, Math.min(originalImage.getWidth(), WIDTH-20), Math.min(originalImage.getHeight(), HEIGHT-40));
+                BufferedImage croppedImage = originalImage.getSubimage(0, 0, Math.min(originalImage.getWidth(), WIDTH-20),
+                        Math.min(originalImage.getHeight(), HEIGHT-40));
                 ImageIcon imageIcon = new ImageIcon(croppedImage);
                 fullSizeImageLabel.setIcon(imageIcon);
             } catch (IOException ex) {
@@ -377,29 +376,28 @@ private String[][] createSampleData() {
     }
 
     private JButton createIconButton(String iconPath, String buttonType) {
+
         ImageIcon iconOriginal = new ImageIcon(iconPath);
         Image iconScaled = iconOriginal.getImage().getScaledInstance(NAV_ICON_SIZE, NAV_ICON_SIZE, Image.SCALE_SMOOTH);
         JButton button = new JButton(new ImageIcon(iconScaled));
         button.setBorder(BorderFactory.createEmptyBorder());
         button.setContentAreaFilled(false);
- 
-        // Define actions based on button type
-        if ("home".equals(buttonType)) {
-            button.addActionListener(e -> openHomeUI());
-        } else if ("profile".equals(buttonType)) {
-            button.addActionListener(e -> openProfileUI());
-        } else if ("notification".equals(buttonType)) {
-            button.addActionListener(e -> notificationsUI());
-        } else if ("explore".equals(buttonType)) {
-            button.addActionListener(e -> exploreUI());
-        } else if ("add".equals(buttonType)) {
-            button.addActionListener(e -> ImageUploadUI());
+
+        Map<String, Runnable> actions = new HashMap<>();
+        actions.put("home", this::openHomeUI);
+        actions.put("notification", this::notificationsUI);
+        actions.put("explore", this::exploreUI);
+        actions.put("add", this::ImageUploadUI);
+
+        if (actions.containsKey(buttonType)) {
+            button.addActionListener(e -> actions.get(buttonType).run());
         }
+
+
         return button;
- 
-        
     }
- 
+
+
     private void openProfileUI() {
         // Open InstagramProfileUI frame
         this.dispose();
