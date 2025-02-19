@@ -85,4 +85,5 @@ public abstract class BaseUI extends JFrame {
         headerPanel.setPreferredSize(new Dimension(WIDTH, 40));
         return headerPanel;
     }
+
 } 
