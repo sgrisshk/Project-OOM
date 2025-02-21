@@ -100,3 +100,9 @@ javac SignInUI.java
 ```bash
 java SignInUI
 ```
+
+---
+
+## **📄 Documentation**
+
+[Project Documentation](https://docs.google.com/document/d/1Sx7Htk5npZDu3UlEhhntNoFlI6Pseg3TN-CIOkKblPQ/edit?usp=sharing)
