@@ -12,8 +12,6 @@ public abstract class NavigateUI extends BaseUI {
         upload.setVisible(true);
     }
 
-
-
     private void notificationsUI() {
         // Open InstagramProfileUI frame
         this.dispose();
