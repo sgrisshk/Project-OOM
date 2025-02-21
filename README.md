@@ -56,7 +56,7 @@ Development of this project was divided into two key phases:
 - Home Feed
 - Explore Page
 - Notifications 
-- 
+
   ✔ **Event-driven interactions** are triggered upon button clicks.
 
 ### 4️⃣ **Post Upload & Display**
@@ -71,7 +71,7 @@ Development of this project was divided into two key phases:
 
 ## **🚀 Example User Journey**
 
-🔹 **Marikie**, a new user, signs up for Quackstagram.  
+🔹 **Marieke**, a new user, signs up for Quackstagram.  
 
 🔹 She uploads a **profile picture and bio**.  
 
@@ -81,7 +81,7 @@ Development of this project was divided into two key phases:
 
 🔹 A **friend comments** on her post. She gets a **notification**.
 
-✅ Marikie enjoys interacting on Quackstagram!
+✅ Marieke enjoys interacting on Quackstagram!
 
 ---
 
