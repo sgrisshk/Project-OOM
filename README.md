@@ -72,9 +72,13 @@ Development of this project was divided into two key phases:
 ## **🚀 Example User Journey**
 
 🔹 **Marikie**, a new user, signs up for Quackstagram.  
+
 🔹 She uploads a **profile picture and bio**.  
+
 🔹 She browses the **Explore Page** and finds an **interesting post**.  
+
 🔹 She **likes** the post and **follows** the user.
+
 🔹 A **friend comments** on her post. She gets a **notification**.
 
 ✅ Marikie enjoys interacting on Quackstagram!
