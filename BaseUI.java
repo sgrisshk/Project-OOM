@@ -1,9 +1,9 @@
-import javax.swing.*;
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import javax.swing.*;
 
 public abstract class BaseUI extends JFrame {
     protected static final int WIDTH = 300;
@@ -51,14 +51,24 @@ public abstract class BaseUI extends JFrame {
     }
 
     protected void navigateToScreen(String screenType) {
-        JFrame newScreen = switch (screenType) {
-            case "home" -> new QuakstagramHomeUI();
-            case "profile" -> new InstagramProfileUI(new User(readLoggedInUsername()));
-            case "notification" -> new NotificationsUI();
-            case "explore" -> new ExploreUI();
-            case "add" -> new ImageUploadUI();
-            default -> null;
-        };
+        JFrame newScreen = null;
+        switch (screenType) {
+            case "home":
+                newScreen = new QuakstagramHomeUI();
+                break;
+            case "profile":
+                newScreen = new InstagramProfileUI(new User(readLoggedInUsername()));
+                break;
+            case "notification":
+                newScreen = new NotificationsUI();
+                break;
+            case "explore":
+                newScreen = new ExploreUI();
+                break;
+            case "add":
+                newScreen = new ImageUploadUI();
+                break;
+        }
 
         if (newScreen != null) {
             this.dispose();

@@ -20,7 +20,7 @@ import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class QuakstagramHomeUI extends JFrame {
+public class QuakstagramHomeUI extends BaseUI {
     private static final int WIDTH = 300;
     private static final int HEIGHT = 500;
     private static final int NAV_ICON_SIZE = 20; // Corrected static size for bottom icons
@@ -34,7 +34,7 @@ public class QuakstagramHomeUI extends JFrame {
     
 
     public QuakstagramHomeUI() {
-        setTitle("Quakstagram Home");
+        super("Quakstagram Home");
         setSize(WIDTH, HEIGHT);
         setMinimumSize(new Dimension(WIDTH, HEIGHT));
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -53,37 +53,9 @@ public class QuakstagramHomeUI extends JFrame {
         add(cardPanel, BorderLayout.CENTER);
         cardLayout.show(cardPanel, "Home"); // Start with the home view
         
-         // Header Panel (reuse from InstagramProfileUI or customize for home page)
-          // Header with the Register label
-          JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-          headerPanel.setBackground(new Color(51, 51, 51)); // Set a darker background for the header
-          JLabel lblRegister = new JLabel("🐥 Quackstagram 🐥");
-          lblRegister.setFont(new Font("Arial", Font.BOLD, 16));
-          lblRegister.setForeground(Color.WHITE); // Set the text color to white
-          headerPanel.add(lblRegister);
-          headerPanel.setPreferredSize(new Dimension(WIDTH, 40)); // Give the header a fixed height
-        
-          add(headerPanel, BorderLayout.NORTH);
-
-
-        // Navigation Bar
-        JPanel navigationPanel = new JPanel();
-        navigationPanel.setBackground(new Color(249, 249, 249));
-        navigationPanel.setLayout(new BoxLayout(navigationPanel, BoxLayout.X_AXIS));
-        navigationPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
-        navigationPanel.add(createIconButton("img/icons/home.png", "home"));
-        navigationPanel.add(Box.createHorizontalGlue());
-        navigationPanel.add(createIconButton("img/icons/search.png","explore"));
-        navigationPanel.add(Box.createHorizontalGlue());
-        navigationPanel.add(createIconButton("img/icons/add.png","add"));
-        navigationPanel.add(Box.createHorizontalGlue());
-        navigationPanel.add(createIconButton("img/icons/heart.png","notification"));
-        navigationPanel.add(Box.createHorizontalGlue());
-        navigationPanel.add(createIconButton("img/icons/profile.png", "profile"));
-
-
-        add(navigationPanel, BorderLayout.SOUTH);
+        // Add the header and navigation panel from BaseUI
+        add(createHeaderPanel("Quackstagram"), BorderLayout.NORTH);
+        add(createNavigationPanel(), BorderLayout.SOUTH);
     }
 
     private void initializeUI() {
@@ -295,12 +267,19 @@ private String[][] createSampleData() {
     return sampleData;
 }
 
-    private JButton createIconButton(String iconPath) {
+    protected JButton createIconButton(String iconPath) {
+        ImageIcon iconOriginal = new ImageIcon(iconPath);
+        Image iconScaled = iconOriginal.getImage().getScaledInstance(NAV_ICON_SIZE, NAV_ICON_SIZE, Image.SCALE_SMOOTH);
+        return new JButton(new ImageIcon(iconScaled));
+    }
+
+    protected JButton createIconButton(String iconPath, String buttonType) {
         ImageIcon iconOriginal = new ImageIcon(iconPath);
         Image iconScaled = iconOriginal.getImage().getScaledInstance(NAV_ICON_SIZE, NAV_ICON_SIZE, Image.SCALE_SMOOTH);
         JButton button = new JButton(new ImageIcon(iconScaled));
         button.setBorder(BorderFactory.createEmptyBorder());
         button.setContentAreaFilled(false);
+        button.addActionListener(e -> navigateToScreen(buttonType));
         return button;
     }
 
@@ -385,30 +364,6 @@ private String[][] createSampleData() {
         displayImage(postData);
     }
 
-    private JButton createIconButton(String iconPath, String buttonType) {
-        ImageIcon iconOriginal = new ImageIcon(iconPath);
-        Image iconScaled = iconOriginal.getImage().getScaledInstance(NAV_ICON_SIZE, NAV_ICON_SIZE, Image.SCALE_SMOOTH);
-        JButton button = new JButton(new ImageIcon(iconScaled));
-        button.setBorder(BorderFactory.createEmptyBorder());
-        button.setContentAreaFilled(false);
- 
-        // Define actions based on button type
-        if ("home".equals(buttonType)) {
-            button.addActionListener(e -> openHomeUI());
-        } else if ("profile".equals(buttonType)) {
-            button.addActionListener(e -> openProfileUI());
-        } else if ("notification".equals(buttonType)) {
-            button.addActionListener(e -> notificationsUI());
-        } else if ("explore".equals(buttonType)) {
-            button.addActionListener(e -> exploreUI());
-        } else if ("add".equals(buttonType)) {
-            button.addActionListener(e -> ImageUploadUI());
-        }
-        return button;
- 
-        
-    }
- 
     private void openProfileUI() {
         // Open InstagramProfileUI frame
         this.dispose();

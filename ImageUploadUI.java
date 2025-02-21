@@ -1,5 +1,3 @@
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.BufferedReader;
@@ -9,6 +7,8 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class ImageUploadUI extends JFrame {
 
