@@ -80,10 +80,4 @@ public class NotificationsUI extends NavigateUI {
         }
         return timeElapsed.toString();
     }
-    protected void openProfileUI() {
-        // Open InstagramProfileUI frame
-        this.dispose();
-        InstagramProfileUI profileUI = new InstagramProfileUI();
-        profileUI.setVisible(true);
-    }
 }

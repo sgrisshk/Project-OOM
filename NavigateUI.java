@@ -13,7 +13,6 @@ public abstract class NavigateUI extends BaseUI {
     }
 
     private void notificationsUI() {
-        // Open InstagramProfileUI frame
         this.dispose();
         NotificationsUI notificationsUI = new NotificationsUI();
         notificationsUI.setVisible(true);
