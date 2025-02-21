@@ -22,7 +22,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
-public class QuakstagramHomeUI extends JFrame {
+public class QuakstagramHomeUI extends NavigateUI {
     private static final int WIDTH = 300;
     private static final int HEIGHT = 500;
     private static final int NAV_ICON_SIZE = 20; // Corrected static size for bottom icons
@@ -246,7 +246,7 @@ private String[][] createSampleData() {
     try (BufferedReader reader = Files.newBufferedReader(Paths.get("data", "following.txt"))) {
         String line;
         while ((line = reader.readLine()) != null) {
-            if (line.startsWith(readUserName() + ":")) {
+            if (line.startsWith(readUserNameFromFile() + ":")) {
                 followedUsers = line.split(":")[1].trim();
                 break;
             }
@@ -357,7 +357,6 @@ private String[][] createSampleData() {
     }
 
     private void refreshDisplayImage(String[] postData, String imageId) {
-        // Read updated likes count from image_details.txt
         try (BufferedReader reader = Files.newBufferedReader(Paths.get("img", "image_details.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -370,12 +369,11 @@ private String[][] createSampleData() {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    
-        // Call displayImage with updated postData
+
         displayImage(postData);
     }
 
-    private JButton createIconButton(String iconPath, String buttonType) {
+    private JButton createIconButtonHomeUI(String iconPath, String buttonType) {
 
         ImageIcon iconOriginal = new ImageIcon(iconPath);
         Image iconScaled = iconOriginal.getImage().getScaledInstance(NAV_ICON_SIZE, NAV_ICON_SIZE, Image.SCALE_SMOOTH);
@@ -398,27 +396,7 @@ private String[][] createSampleData() {
     }
 
 
-    private void openProfileUI() {
-        // Open InstagramProfileUI frame
-        this.dispose();
 
-      User user = new User(readUserName());
-        InstagramProfileUI profileUI = new InstagramProfileUI(user);
-        profileUI.setVisible(true);
-    }
-
-    private String readUserName(){
-        String username = "";
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get("data", "users.txt"))) {
-            String line = reader.readLine();
-            if (line != null) {
-                username = line.split(":")[0].trim();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return username;
-    }
  
      private void notificationsUI() {
         // Open InstagramProfileUI frame

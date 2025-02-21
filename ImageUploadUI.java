@@ -14,7 +14,7 @@ public class ImageUploadUI extends NavigateUI {
 
     private static final int WIDTH = 300;
     private static final int HEIGHT = 500;
-    private static final int NAV_ICON_SIZE = 20; // Size for navigation icons
+    private static final int NAV_ICON_SIZE = 20;
     private JLabel imagePreviewLabel;
     private JTextArea bioTextArea;
     private JButton uploadButton;
@@ -30,8 +30,8 @@ public class ImageUploadUI extends NavigateUI {
     }
 
     private void initializeUI() {
-        JPanel headerPanel = createHeaderPanel(); // Reuse the createHeaderPanel method
-        JPanel navigationPanel = createNavigationPanel(); // Reuse the createNavigationPanel method
+        JPanel headerPanel = createHeaderPanel();
+        JPanel navigationPanel = createNavigationPanel();
 
         // Main content panel
         JPanel contentPanel = new JPanel();
@@ -42,7 +42,6 @@ public class ImageUploadUI extends NavigateUI {
         imagePreviewLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         imagePreviewLabel.setPreferredSize(new Dimension(WIDTH, HEIGHT / 3));
 
-        // Set an initial empty icon to the imagePreviewLabel
         ImageIcon emptyImageIcon = new ImageIcon();
         imagePreviewLabel.setIcon(emptyImageIcon);
 
@@ -68,7 +67,6 @@ public class ImageUploadUI extends NavigateUI {
         saveButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         saveButton.addActionListener(this::saveBioAction);
 
-        // Add panels to frame
         add(headerPanel, BorderLayout.NORTH);
         add(contentPanel, BorderLayout.CENTER);
         add(navigationPanel, BorderLayout.SOUTH);
@@ -86,7 +84,7 @@ public class ImageUploadUI extends NavigateUI {
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
             try {
-                String username = readUsername(); // Read username from users.txt
+                String username = readUserNameFromFile();
                 int imageId = getNextImageId(username);
                 String fileExtension = getFileExtension(selectedFile);
                 String newFileName = username + "_" + imageId + "." + fileExtension;
@@ -94,13 +92,10 @@ public class ImageUploadUI extends NavigateUI {
                 Path destPath = Paths.get("img", "uploaded", newFileName);
                 Files.copy(selectedFile.toPath(), destPath, StandardCopyOption.REPLACE_EXISTING);
 
-                // Save the bio and image ID to a text file
                 saveImageInfo(username + "_" + imageId, username, bioTextArea.getText());
 
-                // Load the image from the saved path
                 ImageIcon imageIcon = new ImageIcon(destPath.toString());
 
-                // Check if imagePreviewLabel has a valid size
                 if (imagePreviewLabel.getWidth() > 0 && imagePreviewLabel.getHeight() > 0) {
                     Image image = imageIcon.getImage();
 
@@ -115,16 +110,13 @@ public class ImageUploadUI extends NavigateUI {
                     int scaledWidth = (int) (scale * imageWidth);
                     int scaledHeight = (int) (scale * imageHeight);
 
-                    // Set the image icon with the scaled image
                     imageIcon.setImage(image.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH));
                 }
 
                 imagePreviewLabel.setIcon(imageIcon);
 
-                // Update the flag to indicate that an image has been uploaded
                 imageUploaded = true;
 
-                // Change the text of the upload button
                 uploadButton.setText("Upload Another Image");
 
                 JOptionPane.showMessageDialog(this, "Image uploaded and preview updated!");
@@ -135,7 +127,7 @@ public class ImageUploadUI extends NavigateUI {
     }
 
     private int getNextImageId(String username) throws IOException {
-        Path storageDir = Paths.get("img", "uploaded"); // Ensure this is the directory where images are saved
+        Path storageDir = Paths.get("img", "uploaded");
         if (!Files.exists(storageDir)) {
             Files.createDirectories(storageDir);
         }
@@ -153,12 +145,11 @@ public class ImageUploadUI extends NavigateUI {
                             maxId = id;
                         }
                     } catch (NumberFormatException ex) {
-                        // Ignore filenames that do not have a valid numeric ID
                     }
                 }
             }
         }
-        return maxId + 1; // Return the next available ID
+        return maxId + 1;
     }
 
     private void saveImageInfo(String imageId, String username, String bio) throws IOException {
@@ -181,66 +172,30 @@ public class ImageUploadUI extends NavigateUI {
         String name = file.getName();
         int lastIndexOf = name.lastIndexOf(".");
         if (lastIndexOf == -1) {
-            return ""; // empty extension
+            return "";
         }
         return name.substring(lastIndexOf + 1);
     }
 
     private void saveBioAction(ActionEvent event) {
-        // Here you would handle saving the bio text
+
         String bioText = bioTextArea.getText();
-        // For example, save the bio text to a file or database
+
         JOptionPane.showMessageDialog(this, "Caption saved: " + bioText);
     }
 
     private JPanel createHeaderPanel() {
 
-        // Header Panel (reuse from InstagramProfileUI or customize for home page)
         // Header with the Register label
         JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        headerPanel.setBackground(new Color(51, 51, 51)); // Set a darker background for the header
+        headerPanel.setBackground(new Color(51, 51, 51));
         JLabel lblRegister = new JLabel(" Upload Image 🐥");
         lblRegister.setFont(new Font("Arial", Font.BOLD, 16));
-        lblRegister.setForeground(Color.WHITE); // Set the text color to white
+        lblRegister.setForeground(Color.WHITE);
         headerPanel.add(lblRegister);
-        headerPanel.setPreferredSize(new Dimension(WIDTH, 40)); // Give the header a fixed height
+        headerPanel.setPreferredSize(new Dimension(WIDTH, 40));
         return headerPanel;
     }
-
-    private String readUsername() throws IOException {
-        Path usersFilePath = Paths.get("data", "users.txt");
-        try (BufferedReader reader = Files.newBufferedReader(usersFilePath)) {
-            String line = reader.readLine();
-            if (line != null) {
-                return line.split(":")[0]; // Extract the username from the first line
-            }
-        }
-        return null; // Return null if no username is found
-    }
-
-
-
-
-
- protected void openProfileUI() {
-        // Open InstagramProfileUI frame
-        this.dispose();
-        String loggedInUsername = "";
-
-        // Read the logged-in user's username from users.txt
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get("data", "users.txt"))) {
-            String line = reader.readLine();
-            if (line != null) {
-                loggedInUsername = line.split(":")[0].trim();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        User user = new User(loggedInUsername);
-        InstagramProfileUI profileUI = new InstagramProfileUI(user);
-        profileUI.setVisible(true);
-    }
-
 
 
 }

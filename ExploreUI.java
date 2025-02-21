@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ExploreUI extends BaseUI {
-    private static final int IMAGE_SIZE = WIDTH / 3; // Size for each image in the grid
+    private static final int IMAGE_SIZE = WIDTH / 3;
 
     public ExploreUI() {
         getContentPane().removeAll();
@@ -39,7 +39,7 @@ public class ExploreUI extends BaseUI {
         searchPanel.add(searchField, BorderLayout.CENTER);
         searchPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, searchField.getPreferredSize().height));
 
-        // Image Grid
+
         JPanel imageGridPanel = new JPanel(new GridLayout(0, 3, 2, 2));
 
         File imageDir = new File("img/uploaded");
@@ -77,13 +77,11 @@ public class ExploreUI extends BaseUI {
         getContentPane().removeAll();
         setLayout(new BorderLayout());
 
-        // Add the header and navigation panels back
         add(createHeaderPanel("Explore Page"), BorderLayout.NORTH);
         add(createNavigationPanel(), BorderLayout.SOUTH);
 
         JPanel imageViewerPanel = new JPanel(new BorderLayout());
 
-        // Extract image ID from the imagePath
         String imageId = new File(imagePath).getName().split("\\.")[0];
 
         // Read image details
@@ -104,10 +102,8 @@ public class ExploreUI extends BaseUI {
             }
         } catch (IOException ex) {
             ex.printStackTrace();
-            // Handle exception
         }
 
-        // Calculate time since posting
         String timeSincePosting = "Unknown";
         if (!timestampString.isEmpty()) {
             LocalDateTime timestamp = LocalDateTime.parse(timestampString, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -116,7 +112,7 @@ public class ExploreUI extends BaseUI {
             timeSincePosting = days + " day" + (days != 1 ? "s" : "") + " ago";
         }
 
-// Top panel for username and time since posting
+        // Top panel for username and time since posting
         JPanel topPanel = new JPanel(new BorderLayout());
         JButton usernameLabel = new JButton(username);
         JLabel timeLabel = new JLabel(timeSincePosting);
@@ -144,7 +140,6 @@ public class ExploreUI extends BaseUI {
         bottomPanel.add(bioTextArea, BorderLayout.CENTER);
         bottomPanel.add(likesLabel, BorderLayout.SOUTH);
 
-        // Adding the components to the frame
         add(topPanel, BorderLayout.NORTH);
         add(imageLabel, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
@@ -154,7 +149,6 @@ public class ExploreUI extends BaseUI {
         JPanel backButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton backButton = new JButton("Back");
 
-        // Make the button take up the full width
         backButton.setPreferredSize(new Dimension(WIDTH-20, backButton.getPreferredSize().height));
 
         backButtonPanel.add(backButton);
@@ -169,20 +163,19 @@ public class ExploreUI extends BaseUI {
         final String finalUsername = username;
 
         usernameLabel.addActionListener(e -> {
-            User user = new User(finalUsername); // Assuming User class has a constructor that takes a username
+            User user = new User(finalUsername);
             InstagramProfileUI profileUI = new InstagramProfileUI(user);
             profileUI.setVisible(true);
-            dispose(); // Close the current frame
+            dispose();
         });
 
-        // Container panel for image and details
+
         JPanel containerPanel = new JPanel(new BorderLayout());
 
         containerPanel.add(topPanel, BorderLayout.NORTH);
         containerPanel.add(imageLabel, BorderLayout.CENTER);
         containerPanel.add(bottomPanel, BorderLayout.SOUTH);
 
-        // Add the container panel and back button panel to the frame
         add(backButtonPanel, BorderLayout.NORTH);
         add(containerPanel, BorderLayout.CENTER);
 
