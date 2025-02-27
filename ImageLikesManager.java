@@ -13,7 +13,7 @@ public class ImageLikesManager {
             likesMap.put(imageID, new HashSet<>());
         }
         Set<String> users = likesMap.get(imageID);
-        if (users.add(username)) { // Only add and save if the user hasn't already liked the image
+        if (users.add(username)) {
             saveLikes(likesMap);
         }
     }
