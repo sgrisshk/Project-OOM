@@ -1,4 +1,6 @@
 import javax.swing.*;
+
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
@@ -11,6 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+
 
 public class InstagramProfileUI extends BaseUI {
 
@@ -25,18 +29,7 @@ public class InstagramProfileUI extends BaseUI {
     private User currentUser; // User object to store the current user's information
 
     public InstagramProfileUI(User user) {
-        // Применяем Nimbus Look & Feel для современного минималистичного внешнего вида
-        try {
-            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            // Если Nimbus не доступен, используется системный L&F
-        }
-
+        super("DACS Profile");
         this.currentUser = user;
         // Initialize counts
         int imageCount = 0;
@@ -68,6 +61,7 @@ public class InstagramProfileUI extends BaseUI {
         System.out.println("Bio for " + currentUser.getUsername() + ": " + bio);
         currentUser.setBio(bio);
 
+
         currentUser.setFollowersCount(result.followersCount());
         currentUser.setFollowingCount(result.followingCount());
         currentUser.setPostCount(imageCount);
@@ -80,39 +74,28 @@ public class InstagramProfileUI extends BaseUI {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         contentPanel = new JPanel();
-        contentPanel.setBackground(Color.WHITE);
         headerPanel = createHeaderPanel();       // Initialize header panel
-        navigationPanel = createNavigationPanel(); // Initialize navigation panel (функция не изменена)
+        navigationPanel = createNavigationPanel(); // Initialize navigation panel
         initializeUI();
+
     }
 
     public InstagramProfileUI() {
-
-        // Применяем Nimbus Look & Feel для современного минималистичного внешнего вида
-        try {
-            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            // Если Nimbus не доступен, используется системный L&F
-        }
-
+        super("DACS Profile");
         setTitle("DACS Profile");
         setSize(WIDTH, HEIGHT);
         setMinimumSize(new Dimension(WIDTH, HEIGHT));
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         contentPanel = new JPanel();
-        contentPanel.setBackground(Color.WHITE);
         headerPanel = createHeaderPanel();       // Initialize header panel
-        navigationPanel = createNavigationPanel(); // Initialize navigation panel (функция не изменена)
+        navigationPanel = createNavigationPanel(); // Initialize navigation panel
         initializeUI();
     }
 
-    private record Result(int followersCount, int followingCount) { }
+    private record Result(int followersCount, int followingCount) {
+
+    }
 
     private Result getResult(int followingCount, int followersCount) {
         Path followingFilePath = Paths.get("data", "following.txt");
@@ -156,6 +139,7 @@ public class InstagramProfileUI extends BaseUI {
         return imageCount;
     }
 
+
     private void initializeUI() {
         getContentPane().removeAll(); // Clear existing components
 
@@ -185,7 +169,8 @@ public class InstagramProfileUI extends BaseUI {
             e.printStackTrace();
         }
 
-        // Header Panel с минималистичным белым фоном
+
+        // Header Panel
         JPanel headerPanel = new JPanel();
         try (Stream<String> lines = Files.lines(Paths.get("data", "users.txt"))) {
             isCurrentUser = lines.anyMatch(line -> line.startsWith(currentUser.getUsername() + ":"));
@@ -194,29 +179,32 @@ public class InstagramProfileUI extends BaseUI {
         }
 
         headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
-        headerPanel.setBackground(Color.WHITE);
+        headerPanel.setBackground(Color.GRAY);
 
         // Top Part of the Header (Profile Image, Stats, Follow Button)
         JPanel topHeaderPanel = new JPanel(new BorderLayout(10, 0));
-        topHeaderPanel.setBackground(Color.WHITE);
+        topHeaderPanel.setBackground(new Color(249, 249, 249));
 
         // Profile image
-        ImageIcon profileIcon = new ImageIcon(new ImageIcon("img/storage/profile/" + currentUser.getUsername() + ".png")
-                .getImage().getScaledInstance(PROFILE_IMAGE_SIZE, PROFILE_IMAGE_SIZE, Image.SCALE_SMOOTH));
+        ImageIcon profileIcon = new ImageIcon(new ImageIcon("img/storage/profile/"+currentUser.getUsername()+".png").getImage().getScaledInstance(PROFILE_IMAGE_SIZE, PROFILE_IMAGE_SIZE, Image.SCALE_SMOOTH));
         JLabel profileImage = new JLabel(profileIcon);
         profileImage.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         topHeaderPanel.add(profileImage, BorderLayout.WEST);
 
         // Stats Panel
-        JPanel statsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
-        statsPanel.setBackground(Color.WHITE);
-        System.out.println("Number of posts for this user " + currentUser.getPostsCount());
-        statsPanel.add(createStatLabel(Integer.toString(currentUser.getPostsCount()), "Posts"));
+        JPanel statsPanel = new JPanel();
+        statsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        statsPanel.setBackground(new Color(249, 249, 249));
+        System.out.println("Number of posts for this user"+currentUser.getPostsCount());
+        statsPanel.add(createStatLabel(Integer.toString(currentUser.getPostsCount()) , "Posts"));
         statsPanel.add(createStatLabel(Integer.toString(currentUser.getFollowersCount()), "Followers"));
         statsPanel.add(createStatLabel(Integer.toString(currentUser.getFollowingCount()), "Following"));
         statsPanel.setBorder(BorderFactory.createEmptyBorder(25, 0, 10, 0)); // Add some vertical padding
 
-        // Follow Button (или Edit Profile для текущего пользователя)
+
+// Follow Button
+// Follow or Edit Profile Button
+// followButton.addActionListener(e -> handleFollowAction(currentUser.getUsername()));
         JButton followButton;
         if (isCurrentUser) {
             followButton = new JButton("Edit Profile");
@@ -248,20 +236,19 @@ public class InstagramProfileUI extends BaseUI {
             });
         }
 
-        // Обновлённый дизайн кнопки: минималистичный, с белым фоном и тонкой рамкой
         followButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        followButton.setFont(new Font("SansSerif", Font.BOLD, 12));
-        followButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, followButton.getMinimumSize().height));
-        followButton.setBackground(Color.WHITE);
-        followButton.setForeground(Color.DARK_GRAY);
+        followButton.setFont(new Font("Arial", Font.BOLD, 12));
+        followButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, followButton.getMinimumSize().height)); // Make the button fill the horizontal space
+        followButton.setBackground(new Color(225, 228, 232)); // A soft, appealing color that complements the UI
+        followButton.setForeground(Color.BLACK);
         followButton.setOpaque(true);
-        followButton.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
-        followButton.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        followButton.setBorderPainted(false);
+        followButton.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0)); // Add some vertical padding
+
 
         // Add Stats and Follow Button to a combined Panel
         JPanel statsFollowPanel = new JPanel();
         statsFollowPanel.setLayout(new BoxLayout(statsFollowPanel, BoxLayout.Y_AXIS));
-        statsFollowPanel.setBackground(Color.WHITE);
         statsFollowPanel.add(statsPanel);
         statsFollowPanel.add(followButton);
         topHeaderPanel.add(statsFollowPanel, BorderLayout.CENTER);
@@ -269,18 +256,19 @@ public class InstagramProfileUI extends BaseUI {
         headerPanel.add(topHeaderPanel);
 
         // Profile Name and Bio Panel
-        JPanel profileNameAndBioPanel = new JPanel(new BorderLayout());
-        profileNameAndBioPanel.setBackground(Color.WHITE);
+        JPanel profileNameAndBioPanel = new JPanel();
+        profileNameAndBioPanel.setLayout(new BorderLayout());
+        profileNameAndBioPanel.setBackground(new Color(249, 249, 249));
 
         JLabel profileNameLabel = new JLabel(currentUser.getUsername());
-        profileNameLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
+        profileNameLabel.setFont(new Font("Arial", Font.BOLD, 14));
         profileNameLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10)); // Padding on the sides
 
         JTextArea profileBio = new JTextArea(currentUser.getBio());
+        System.out.println("This is the bio "+currentUser.getUsername());
         profileBio.setEditable(false);
-        profileBio.setFont(new Font("SansSerif", Font.PLAIN, 12));
-        profileBio.setBackground(Color.WHITE);
-        profileBio.setForeground(Color.DARK_GRAY);
+        profileBio.setFont(new Font("Arial", Font.PLAIN, 12));
+        profileBio.setBackground(new Color(249, 249, 249));
         profileBio.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10)); // Padding on the sides
 
         profileNameAndBioPanel.add(profileNameLabel, BorderLayout.NORTH);
@@ -288,8 +276,12 @@ public class InstagramProfileUI extends BaseUI {
 
         headerPanel.add(profileNameAndBioPanel);
 
+
+
         return headerPanel;
+
     }
+
 
     private void handleFollowAction(String usernameToFollow) {
         Path followingFilePath = Paths.get("data", "following.txt");
@@ -306,7 +298,7 @@ public class InstagramProfileUI extends BaseUI {
                 }
             }
 
-            System.out.println("Real user is " + currentUserUsername);
+            System.out.println("Real user is "+currentUserUsername);
             // If currentUserUsername is not empty, process following.txt
             if (!currentUserUsername.isEmpty()) {
                 boolean found = false;
@@ -344,6 +336,12 @@ public class InstagramProfileUI extends BaseUI {
         }
     }
 
+
+
+
+
+
+
     private void initializeImageGrid() {
         contentPanel.removeAll(); // Clear existing content
         contentPanel.setLayout(new GridLayout(0, 3, 5, 5)); // Grid layout for image grid
@@ -352,8 +350,7 @@ public class InstagramProfileUI extends BaseUI {
         try (Stream<Path> paths = Files.list(imageDir)) {
             paths.filter(path -> path.getFileName().toString().startsWith(currentUser.getUsername() + "_"))
                     .forEach(path -> {
-                        ImageIcon imageIcon = new ImageIcon(new ImageIcon(path.toString())
-                                .getImage().getScaledInstance(GRID_IMAGE_SIZE, GRID_IMAGE_SIZE, Image.SCALE_SMOOTH));
+                        ImageIcon imageIcon = new ImageIcon(new ImageIcon(path.toString()).getImage().getScaledInstance(GRID_IMAGE_SIZE, GRID_IMAGE_SIZE, Image.SCALE_SMOOTH));
                         JLabel imageLabel = new JLabel(imageIcon);
                         imageLabel.addMouseListener(new MouseAdapter() {
                             @Override
@@ -378,6 +375,8 @@ public class InstagramProfileUI extends BaseUI {
         repaint();
     }
 
+
+
     private void displayImage(ImageIcon imageIcon) {
         contentPanel.removeAll(); // Remove existing content
         contentPanel.setLayout(new BorderLayout()); // Change layout for image display
@@ -387,12 +386,6 @@ public class InstagramProfileUI extends BaseUI {
         contentPanel.add(fullSizeImageLabel, BorderLayout.CENTER);
 
         JButton backButton = new JButton("Back");
-        // Обновлённый дизайн кнопки "Back"
-        backButton.setFont(new Font("SansSerif", Font.PLAIN, 12));
-        backButton.setBackground(Color.WHITE);
-        backButton.setForeground(Color.DARK_GRAY);
-        backButton.setOpaque(true);
-        backButton.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
         backButton.addActionListener(e -> {
             getContentPane().removeAll(); // Remove all components from the frame
             initializeUI(); // Re-initialize the UI
@@ -403,11 +396,12 @@ public class InstagramProfileUI extends BaseUI {
         repaint();
     }
 
+
+
     private JLabel createStatLabel(String number, String text) {
         JLabel label = new JLabel("<html><div style='text-align: center;'>" + number + "<br/>" + text + "</div></html>", SwingConstants.CENTER);
-        label.setFont(new Font("SansSerif", Font.BOLD, 12));
-        label.setForeground(Color.DARK_GRAY);
+        label.setFont(new Font("Arial", Font.BOLD, 12));
+        label.setForeground(Color.BLACK);
         return label;
     }
-
 }
