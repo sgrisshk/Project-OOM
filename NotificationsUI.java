@@ -11,7 +11,7 @@ import java.time.temporal.ChronoUnit;
 public class NotificationsUI extends NavigateUI {
 
     public NotificationsUI() {
-
+        super("Notifications");
         initializeUI();
     }
 
