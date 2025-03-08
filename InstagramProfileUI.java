@@ -1,16 +1,33 @@
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.stream.Stream;
-import javax.swing.*;
 
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 
-
-public class InstagramProfileUI extends JFrame {
+public class InstagramProfileUI extends BaseUI {
 
     private static final int WIDTH = 300;
     private static final int HEIGHT = 500;
@@ -23,7 +40,7 @@ public class InstagramProfileUI extends JFrame {
     private User currentUser; // User object to store the current user's information
 
     public InstagramProfileUI(User user) {
-        super("DACS Profile");
+        super("Instagram Profile");
         this.currentUser = user;
          // Initialize counts
         int imageCount = 0;
@@ -107,15 +124,13 @@ public class InstagramProfileUI extends JFrame {
 
 
     public InstagramProfileUI() {
-        super("DACS Profile");
-        setTitle("DACS Profile");
-        setSize(WIDTH, HEIGHT);
-        setMinimumSize(new Dimension(WIDTH, HEIGHT));
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLayout(new BorderLayout());
-        contentPanel = new JPanel();
-        headerPanel = createHeaderPanel();       // Initialize header panel
-        navigationPanel = createNavigationPanel(); // Initialize navigation panel
+        super("Instagram Profile");
+        // Default constructor or load user from file if needed
+        try {
+            this.currentUser = new User(readLoggedInUsername());
+        } catch (Exception e) {
+            this.currentUser = new User("default_user");
+        }
         initializeUI();
     }
 
@@ -319,7 +334,8 @@ public class InstagramProfileUI extends JFrame {
 
     
     
-    private JPanel createNavigationPanel() {
+    @Override
+    protected JPanel createNavigationPanel() {
         // Navigation Bar
         JPanel navigationPanel = new JPanel();
         navigationPanel.setBackground(new Color(249, 249, 249));
@@ -337,7 +353,6 @@ public class InstagramProfileUI extends JFrame {
         navigationPanel.add(createIconButton("img/icons/profile.png", "profile"));
 
         return navigationPanel;
-
     }
 
     private void initializeImageGrid() {
