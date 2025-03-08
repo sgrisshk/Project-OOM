@@ -1,0 +1,11 @@
+# messageID|timestamp|sender|receiver|content
+# Format: INTEGER|ISO_DATE_TIME|STRING|STRING|STRING
+
+1|2023-06-15T14:30:22|alice|bob|Hey Bob, how are you?
+2|2023-06-15T14:31:05|bob|alice|I'm good, thanks for asking!
+3|2023-06-15T14:31:45|alice|bob|Want to go for coffee later?
+4|2023-06-15T15:02:31|charlie|alice|Hi Alice, did you finish the project?
+5|2023-06-15T15:10:12|alice|charlie|Not yet, I'm still working on it.
+6|2025-03-06T18:30:57.203172|a|Xylo|wsh
+7|2025-03-06T18:37:40.7345056|a|Xylo|sasa
+8|2025-03-07T14:47:07.6321737|a|Xylo|ez

@@ -1,5 +1,5 @@
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 // Represents a user on Quackstagram
 class User {
@@ -10,12 +10,16 @@ class User {
     private int followersCount;
     private int followingCount;
     private List<Picture> pictures;
+    private List<Message> sentMessages;
+    private List<Message> receivedMessages;
 
     public User(String username, String bio, String password) {
         this.username = username;
         this.bio = bio;
         this.password = password;
         this.pictures = new ArrayList<>();
+        this.sentMessages = new ArrayList<>();
+        this.receivedMessages = new ArrayList<>();
         // Initialize counts to 0
         this.postsCount = 0;
         this.followersCount = 0;
@@ -24,6 +28,10 @@ class User {
 
     public User(String username){
         this.username = username;
+        this.password = ""; // Initialize password to empty string
+        this.bio = "";      // Initialize bio to empty string
+        this.sentMessages = new ArrayList<>();
+        this.receivedMessages = new ArrayList<>();
     }
 
     // Add a picture to the user's profile
@@ -31,6 +39,29 @@ class User {
         pictures.add(picture);
         postsCount++;
     }
+
+    // Message sending method
+    public void sendMessage(User receiver, String content) {
+        Message message = MessageService.saveMessage(this, receiver, content);
+        if (message != null) {
+            sentMessages.add(message);
+            receiver.receiveMessage(message);
+        }
+    }
+    
+    // Method to handle receiving a message
+    public void receiveMessage(Message message) {
+        receivedMessages.add(message);
+    }
+    
+    // Get all messages between this user and another user
+    public List<Message> getConversationWith(User otherUser) {
+        return MessageService.getConversation(this, otherUser);
+    }
+    
+    // Getter methods for messages
+    public List<Message> getSentMessages() { return sentMessages; }
+    public List<Message> getReceivedMessages() { return receivedMessages; }
 
     // Getter methods for user details
     public String getUsername() { return username; }
@@ -48,7 +79,20 @@ class User {
     // Implement the toString method for saving user information
 @Override
 public String toString() {
-    return username + ":" + bio + ":" + password; // Format as needed
+    return username + ":" + password + ":" + bio; // Correct format: username:password:bio
+}
+
+@Override
+public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null || getClass() != obj.getClass()) return false;
+    User otherUser = (User) obj;
+    return username != null && username.equals(otherUser.username);
+}
+
+@Override
+public int hashCode() {
+    return username != null ? username.hashCode() : 0;
 }
 
 }

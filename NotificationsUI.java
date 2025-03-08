@@ -1,4 +1,3 @@
-import javax.swing.*;
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -7,11 +6,12 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import javax.swing.*;
 
 public class NotificationsUI extends NavigateUI {
 
     public NotificationsUI() {
-
+        super("Quackstagram - Notifications");
         initializeUI();
     }
 

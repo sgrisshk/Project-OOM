@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -22,6 +21,7 @@ public class ImageUploadUI extends NavigateUI {
     private boolean imageUploaded = false;
 
     public ImageUploadUI() {
+        super("Quackstagram - Upload Image");
         setSize(WIDTH, HEIGHT);
         setMinimumSize(new Dimension(WIDTH, HEIGHT));
         setDefaultCloseOperation(EXIT_ON_CLOSE);

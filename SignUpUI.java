@@ -1,61 +1,41 @@
-import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.io.*;
+import javax.swing.*;
 
 public class SignUpUI extends AuthUI {
-    private final String credentialsFilePath = "data/credentials.txt";
+    private final UserService userService;
 
     public SignUpUI() {
         super("Sign Up");
+        this.userService = new UserService();
         initializeUI(
-                true,
-                true,
+                false,  // no bio
+                false,  // no photo upload
                 "Register",
                 this::onRegisterClicked,
                 "Already have an account? Sign In",
-                this::openSignInUI
+                this::openSignInUI,
+                null,   // no tertiary button
+                null,   // no tertiary button color
+                null    // no tertiary button action
         );
     }
 
     private void onRegisterClicked(ActionEvent e) {
         String username = txtUsername.getText();
         String password = txtPassword.getText();
-        String bio = txtBio.getText();
 
-        if (doesUsernameExist(username)) {
-            JOptionPane.showMessageDialog(this, "Username already exists. Choose another one.", "Error", JOptionPane.ERROR_MESSAGE);
-        } else {
-            saveCredentials(username, password, bio);
-            dispose();
-            SwingUtilities.invokeLater(SignInUI::new);
-        }
-    }
-
-    private boolean doesUsernameExist(String username) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(credentialsFilePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.startsWith(username + ":")) return true;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    private void saveCredentials(String username, String password, String bio) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(credentialsFilePath, true))) {
-            writer.write(username + ":" + password + ":" + bio);
-            writer.newLine();
-        } catch (IOException e) {
-            e.printStackTrace();
+        try {
+            // Register with empty bio first
+            User newUser = userService.registerUser(username, password, "");
+            JOptionPane.showMessageDialog(this, "Registration successful! Let's set up your profile.", "Success", JOptionPane.INFORMATION_MESSAGE);
+            // Navigate to profile setup
+            NavigationUtils.navigateTo(this, () -> new ProfileSetupUI(newUser));
+        } catch (IllegalArgumentException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void openSignInUI(ActionEvent e) {
-        setVisible(false);  // Скрываем окно, но не закрываем приложение
-        SwingUtilities.invokeLater(() -> {
-            new SignInUI().setVisible(true);
-        });
+        NavigationUtils.navigateTo(this, () -> new SignInUI());
     }
 }

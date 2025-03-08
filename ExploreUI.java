@@ -1,10 +1,7 @@
-import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,14 +10,15 @@ import java.nio.file.Paths;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.imageio.ImageIO;
+import javax.swing.*;
 
 public class ExploreUI extends BaseUI {
     private static final int IMAGE_SIZE = WIDTH / 3;
 
     public ExploreUI() {
+        super("Quackstagram - Explore");
         getContentPane().removeAll();
         setLayout(new BorderLayout());
 

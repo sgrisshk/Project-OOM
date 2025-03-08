@@ -73,11 +73,35 @@ public class QuakstagramHomeUI extends BaseUI {
 
         add(cardPanel, BorderLayout.CENTER);
         cardLayout.show(cardPanel, "Home");
-        
+        JButton messageButton = createIconButton("img/icons/message.png");
+
         // Add header and navigation
         JPanel headerPanel = createHeaderPanel("Quackstagram");
         headerPanel.setBackground(HEADER_COLOR);
         headerPanel.setForeground(Color.WHITE);
+        
+        // Add message icon to the header panel
+        messageButton.addActionListener(e -> {
+            // Get current user and open MessageUI
+            String username = getCurrentUser();
+            User currentUser = new User(username);
+            MessageUI.showMessagesFor(currentUser);
+        });
+        
+        // Change layout to BorderLayout to position the message icon on the right
+        headerPanel.setLayout(new BorderLayout());
+        // Move the existing title to the center
+        JLabel titleLabel = new JLabel("Quackstagram 🐥", JLabel.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        titleLabel.setForeground(Color.WHITE);
+        headerPanel.add(titleLabel, BorderLayout.CENTER);
+        
+        // Add message button to the right
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        rightPanel.setBackground(HEADER_COLOR);
+        rightPanel.add(messageButton);
+        headerPanel.add(rightPanel, BorderLayout.EAST);
+        
         add(headerPanel, BorderLayout.NORTH);
         add(createNavigationPanel(), BorderLayout.SOUTH);
     }

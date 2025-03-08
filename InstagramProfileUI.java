@@ -1,22 +1,16 @@
-import javax.swing.*;
-
-
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.awt.*;
 import java.nio.file.*;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.swing.*;
 
 
 
-public class InstagramProfileUI extends BaseUI {
+public class InstagramProfileUI extends JFrame {
 
     private static final int WIDTH = 300;
     private static final int HEIGHT = 500;
@@ -30,114 +24,99 @@ public class InstagramProfileUI extends BaseUI {
 
     public InstagramProfileUI(User user) {
         this.currentUser = user;
-        // Initialize counts
+         // Initialize counts
         int imageCount = 0;
         int followersCount = 0;
         int followingCount = 0;
-
+       
         // Step 1: Read image_details.txt to count the number of images posted by the user
-        imageCount = getImageCount(imageCount);
-
-        // Step 2: Read following.txt to calculate followers and following
-        Result result = getResult(followingCount, followersCount);
-
-        String bio = "";
-
-        Path bioDetailsFilePath = Paths.get("data", "credentials.txt");
-        try (BufferedReader bioDetailsReader = Files.newBufferedReader(bioDetailsFilePath)) {
-            String line;
-            while ((line = bioDetailsReader.readLine()) != null) {
-                String[] parts = line.split(":");
-                if (parts[0].equals(currentUser.getUsername()) && parts.length >= 3) {
-                    bio = parts[2];
-                    break; // Exit the loop once the matching bio is found
-                }
+    Path imageDetailsFilePath = Paths.get("img", "image_details.txt");
+    try (BufferedReader imageDetailsReader = Files.newBufferedReader(imageDetailsFilePath)) {
+        String line;
+        while ((line = imageDetailsReader.readLine()) != null) {
+            if (line.contains("Username: " + currentUser.getUsername())) {
+                imageCount++;
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-
-        System.out.println("Bio for " + currentUser.getUsername() + ": " + bio);
-        currentUser.setBio(bio);
-
-
-        currentUser.setFollowersCount(result.followersCount());
-        currentUser.setFollowingCount(result.followingCount());
-        currentUser.setPostCount(imageCount);
-
-        System.out.println(currentUser.getPostsCount());
-
-        setTitle("DACS Profile");
-        setSize(WIDTH, HEIGHT);
-        setMinimumSize(new Dimension(WIDTH, HEIGHT));
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLayout(new BorderLayout());
-        contentPanel = new JPanel();
-        headerPanel = createHeaderPanel();       // Initialize header panel
-        navigationPanel = createNavigationPanel(); // Initialize navigation panel
-        initializeUI();
-
+    } catch (IOException e) {
+        e.printStackTrace();
     }
 
-    public InstagramProfileUI() {
-
-        setTitle("DACS Profile");
-        setSize(WIDTH, HEIGHT);
-        setMinimumSize(new Dimension(WIDTH, HEIGHT));
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLayout(new BorderLayout());
-        contentPanel = new JPanel();
-        headerPanel = createHeaderPanel();       // Initialize header panel
-        navigationPanel = createNavigationPanel(); // Initialize navigation panel
-        initializeUI();
-    }
-
-    private record Result(int followersCount, int followingCount) {
-
-    }
-
-    private Result getResult(int followingCount, int followersCount) {
-        Path followingFilePath = Paths.get("data", "following.txt");
-        try (BufferedReader followingReader = Files.newBufferedReader(followingFilePath)) {
-            String line;
-            while ((line = followingReader.readLine()) != null) {
-                String[] parts = line.split(":");
-                if (parts.length == 2) {
-                    String username = parts[0].trim();
-                    String[] followingUsers = parts[1].split(";");
-                    if (username.equals(currentUser.getUsername())) {
-                        followingCount = followingUsers.length;
-                    } else {
-                        for (String followingUser : followingUsers) {
-                            if (followingUser.trim().equals(currentUser.getUsername())) {
-                                followersCount++;
-                            }
+    // Step 2: Read following.txt to calculate followers and following
+    Path followingFilePath = Paths.get("data", "following.txt");
+    try (BufferedReader followingReader = Files.newBufferedReader(followingFilePath)) {
+        String line;
+        while ((line = followingReader.readLine()) != null) {
+            String[] parts = line.split(":");
+            if (parts.length == 2) {
+                String username = parts[0].trim();
+                String[] followingUsers = parts[1].split(";");
+                if (username.equals(currentUser.getUsername())) {
+                    followingCount = followingUsers.length;
+                } else {
+                    for (String followingUser : followingUsers) {
+                        if (followingUser.trim().equals(currentUser.getUsername())) {
+                            followersCount++;
                         }
                     }
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-        Result result = new Result(followersCount, followingCount);
-        return result;
+    } catch (IOException e) {
+        e.printStackTrace();
     }
 
-    private int getImageCount(int imageCount) {
-        Path imageDetailsFilePath = Paths.get("img", "image_details.txt");
-        try (BufferedReader imageDetailsReader = Files.newBufferedReader(imageDetailsFilePath)) {
-            String line;
-            while ((line = imageDetailsReader.readLine()) != null) {
-                if (line.contains("Username: " + currentUser.getUsername())) {
-                    imageCount++;
-                }
+    String bio = "";
+
+    Path bioDetailsFilePath = Paths.get("data", "credentials.txt");
+    try (BufferedReader bioDetailsReader = Files.newBufferedReader(bioDetailsFilePath)) {
+        String line;
+        while ((line = bioDetailsReader.readLine()) != null) {
+            String[] parts = line.split(":");
+            if (parts[0].equals(currentUser.getUsername()) && parts.length >= 3) {
+                bio = parts[2];
+                break; // Exit the loop once the matching bio is found
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-        return imageCount;
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+    
+    System.out.println("Bio for " + currentUser.getUsername() + ": " + bio);
+    currentUser.setBio(bio);
+    
+
+    currentUser.setFollowersCount(followersCount);
+    currentUser.setFollowingCount(followingCount);
+    currentUser.setPostCount(imageCount);
+
+    System.out.println(currentUser.getPostsCount());
+
+     setTitle("DACS Profile");
+        setSize(WIDTH, HEIGHT);
+        setMinimumSize(new Dimension(WIDTH, HEIGHT));
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+        contentPanel = new JPanel();
+        headerPanel = createHeaderPanel();       // Initialize header panel
+        navigationPanel = createNavigationPanel(); // Initialize navigation panel
+
+        initializeUI();
     }
 
+
+      public InstagramProfileUI() {
+
+        setTitle("DACS Profile");
+        setSize(WIDTH, HEIGHT);
+        setMinimumSize(new Dimension(WIDTH, HEIGHT));
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+        contentPanel = new JPanel();
+        headerPanel = createHeaderPanel();       // Initialize header panel
+        navigationPanel = createNavigationPanel(); // Initialize navigation panel
+        initializeUI();
+    }
 
     private void initializeUI() {
         getContentPane().removeAll(); // Clear existing components
@@ -337,9 +316,28 @@ headerPanel.add(profileNameAndBioPanel);
 
     
 
+    
+    
+    private JPanel createNavigationPanel() {
+        // Navigation Bar
+        JPanel navigationPanel = new JPanel();
+        navigationPanel.setBackground(new Color(249, 249, 249));
+        navigationPanel.setLayout(new BoxLayout(navigationPanel, BoxLayout.X_AXIS));
+        navigationPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
+        navigationPanel.add(createIconButton("img/icons/home.png", "home"));
+        navigationPanel.add(Box.createHorizontalGlue());
+        navigationPanel.add(createIconButton("img/icons/search.png","explore"));
+        navigationPanel.add(Box.createHorizontalGlue());
+        navigationPanel.add(createIconButton("img/icons/add.png","add"));
+        navigationPanel.add(Box.createHorizontalGlue());
+        navigationPanel.add(createIconButton("img/icons/heart.png","notification"));
+        navigationPanel.add(Box.createHorizontalGlue());
+        navigationPanel.add(createIconButton("img/icons/profile.png", "profile"));
 
+        return navigationPanel;
 
+    }
 
 private void initializeImageGrid() {
     contentPanel.removeAll(); // Clear existing content
@@ -404,9 +402,64 @@ private void initializeImageGrid() {
         return label;
     }
 
-
+    private JButton createIconButton(String iconPath, String buttonType) {
+        ImageIcon iconOriginal = new ImageIcon(iconPath);
+        Image iconScaled = iconOriginal.getImage().getScaledInstance(NAV_ICON_SIZE, NAV_ICON_SIZE, Image.SCALE_SMOOTH);
+        JButton button = new JButton(new ImageIcon(iconScaled));
+        button.setBorder(BorderFactory.createEmptyBorder());
+        button.setContentAreaFilled(false);
+    
+        // Define actions based on button type
+        if ("home".equals(buttonType)) {
+            button.addActionListener(e -> openHomeUI());
+        } else if ("profile".equals(buttonType)) {
+            //
+        } else if ("notification".equals(buttonType)) {
+            button.addActionListener(e -> notificationsUI());
+        } else if ("explore".equals(buttonType)) {
+            button.addActionListener(e -> exploreUI());
+        } else if ("add".equals(buttonType)) {
+            button.addActionListener(e -> ImageUploadUI());
+        }
+        return button;
+    
+        
+    }
  
+    private void ImageUploadUI() {
+        // Open InstagramProfileUI frame
+        this.dispose();
+        ImageUploadUI upload = new ImageUploadUI();
+        upload.setVisible(true);
+    }
 
+    private void openProfileUI() {
+        // Open InstagramProfileUI frame
+        this.dispose();
+        InstagramProfileUI profileUI = new InstagramProfileUI();
+        profileUI.setVisible(true);
+    }
+ 
+     private void notificationsUI() {
+        // Open InstagramProfileUI frame
+        this.dispose();
+        NotificationsUI notificationsUI = new NotificationsUI();
+        notificationsUI.setVisible(true);
+    }
+ 
+    private void openHomeUI() {
+        // Open InstagramProfileUI frame
+        this.dispose();
+        QuakstagramHomeUI homeUI = new QuakstagramHomeUI();
+        homeUI.setVisible(true);
+    }
+ 
+    private void exploreUI() {
+        // Open InstagramProfileUI frame
+        this.dispose();
+        ExploreUI explore = new ExploreUI();
+        explore.setVisible(true);
+    }   
 
     
 }
