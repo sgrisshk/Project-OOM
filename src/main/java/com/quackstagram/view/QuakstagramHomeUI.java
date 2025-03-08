@@ -1,3 +1,5 @@
+package com.quackstagram.view;
+
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -18,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.*;
+
+import com.quackstagram.model.User;
 
 public class QuakstagramHomeUI extends BaseUI {
     // UI dimensions

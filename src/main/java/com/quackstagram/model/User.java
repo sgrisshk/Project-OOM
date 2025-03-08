@@ -29,6 +29,14 @@ public class User {
         this.followingCount = 0;
     }
 
+    public User(User user){
+        this.username = user.username;
+        this.password = ""; // Initialize password to empty string
+        this.bio = "";      // Initialize bio to empty string
+        this.sentMessages = new ArrayList<>();
+        this.receivedMessages = new ArrayList<>();
+    }
+
     public User(String username){
         this.username = username;
         this.password = ""; // Initialize password to empty string

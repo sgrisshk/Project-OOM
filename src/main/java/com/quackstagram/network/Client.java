@@ -1,3 +1,5 @@
+package com.quackstagram.network;
+
 import java.io.*;
 import java.net.*;
 
@@ -25,5 +27,7 @@ public class Client implements Runnable{
                     
                 }
             }   
-    }   
+    }
+    }
+}   
 

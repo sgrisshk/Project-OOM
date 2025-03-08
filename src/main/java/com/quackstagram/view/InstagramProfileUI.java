@@ -1,3 +1,5 @@
+package com.quackstagram.view;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -27,6 +29,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 
+import com.quackstagram.model.User;
+
 public class InstagramProfileUI extends BaseUI {
 
     private static final int WIDTH = 300;
@@ -40,88 +44,15 @@ public class InstagramProfileUI extends BaseUI {
     private User currentUser; // User object to store the current user's information
 
     public InstagramProfileUI(User user) {
-        super("Instagram Profile");
-        this.currentUser = user;
-         // Initialize counts
-        int imageCount = 0;
-        int followersCount = 0;
-        int followingCount = 0;
-       
-        // Step 1: Read image_details.txt to count the number of images posted by the user
-    Path imageDetailsFilePath = Paths.get("img", "image_details.txt");
-    try (BufferedReader imageDetailsReader = Files.newBufferedReader(imageDetailsFilePath)) {
-        String line;
-        while ((line = imageDetailsReader.readLine()) != null) {
-            if (line.contains("Username: " + currentUser.getUsername())) {
-                imageCount++;
-            }
+        super("Quackstagram - Profile");
+        try {
+            this.currentUser = new User(user);
+            initializeUI();
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Gérer l'erreur de chargement de l'utilisateur
         }
-    } catch (IOException e) {
-        e.printStackTrace();
     }
-
-    // Step 2: Read following.txt to calculate followers and following
-    Path followingFilePath = Paths.get("data", "following.txt");
-    try (BufferedReader followingReader = Files.newBufferedReader(followingFilePath)) {
-        String line;
-        while ((line = followingReader.readLine()) != null) {
-            String[] parts = line.split(":");
-            if (parts.length == 2) {
-                String username = parts[0].trim();
-                String[] followingUsers = parts[1].split(";");
-                if (username.equals(currentUser.getUsername())) {
-                    followingCount = followingUsers.length;
-                } else {
-                    for (String followingUser : followingUsers) {
-                        if (followingUser.trim().equals(currentUser.getUsername())) {
-                            followersCount++;
-                        }
-                    }
-                }
-            }
-        }
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
-
-    String bio = "";
-
-    Path bioDetailsFilePath = Paths.get("data", "credentials.txt");
-    try (BufferedReader bioDetailsReader = Files.newBufferedReader(bioDetailsFilePath)) {
-        String line;
-        while ((line = bioDetailsReader.readLine()) != null) {
-            String[] parts = line.split(":");
-            if (parts[0].equals(currentUser.getUsername()) && parts.length >= 3) {
-                bio = parts[2];
-                break; // Exit the loop once the matching bio is found
-            }
-        }
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
-    
-    System.out.println("Bio for " + currentUser.getUsername() + ": " + bio);
-    currentUser.setBio(bio);
-    
-
-    currentUser.setFollowersCount(followersCount);
-    currentUser.setFollowingCount(followingCount);
-    currentUser.setPostCount(imageCount);
-
-    System.out.println(currentUser.getPostsCount());
-
-     setTitle("DACS Profile");
-        setSize(WIDTH, HEIGHT);
-        setMinimumSize(new Dimension(WIDTH, HEIGHT));
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLayout(new BorderLayout());
-        contentPanel = new JPanel();
-        headerPanel = createHeaderPanel();       // Initialize header panel
-        navigationPanel = createNavigationPanel(); // Initialize navigation panel
-
-        initializeUI();
-    }
-
 
     public InstagramProfileUI() {
         super("Instagram Profile");

@@ -1,6 +1,11 @@
+package com.quackstagram.view;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+
+import com.quackstagram.model.User;
+import com.quackstagram.service.UserService;
 
 public class ChangePasswordUI extends BaseUI {
     private static final Dimension FIELD_SIZE = new Dimension(250, 35);

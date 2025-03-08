@@ -1,3 +1,5 @@
+package com.quackstagram.view;
+
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;

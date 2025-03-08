@@ -1,3 +1,5 @@
+package com.quackstagram.view;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -20,7 +22,6 @@ public class ImageUploadUI extends NavigateUI {
 
     public ImageUploadUI() {
         super("Quackstagram - Upload Image");
-        super("Image Upload");
         setSize(WIDTH, HEIGHT);
         setMinimumSize(new Dimension(WIDTH, HEIGHT));
         setDefaultCloseOperation(EXIT_ON_CLOSE);

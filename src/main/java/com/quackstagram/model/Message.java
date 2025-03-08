@@ -1,6 +1,5 @@
-package com.quackstagram.model;
-
 import java.time.LocalDateTime;
+import com.quackstagram.model.User;
 
 /**
  * Représente un message entre deux utilisateurs

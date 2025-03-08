@@ -1,3 +1,5 @@
+package com.quackstagram.view;
+
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -13,6 +15,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import javax.swing.*;
+
+import com.quackstagram.model.User;
 
 public class ExploreUI extends BaseUI {
     private static final int IMAGE_SIZE = WIDTH / 3;

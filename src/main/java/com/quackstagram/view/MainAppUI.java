@@ -1,5 +1,8 @@
+package com.quackstagram.view;
+
 import java.awt.*;
 import javax.swing.*;
+import com.quackstagram.model.User;
 
 /**
  * Main application UI with access to the messaging system

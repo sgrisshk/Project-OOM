@@ -1,12 +1,23 @@
+package com.quackstagram.view;
+
 import java.awt.*;
 import java.awt.event.*;
-import java.io.BufferedReader;
-import java.io.IOException;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.function.Supplier;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import com.quackstagram.model.User;
+import com.quackstagram.view.InstagramProfileUI;
+import com.quackstagram.view.QuakstagramHomeUI;
+import com.quackstagram.view.NotificationsUI;
+import com.quackstagram.view.ExploreUI;
+import com.quackstagram.view.ImageUploadUI;
 
 public abstract class BaseUI extends JFrame {
     protected static final int WIDTH = 300;
@@ -65,7 +76,10 @@ public abstract class BaseUI extends JFrame {
                 newScreen = new QuakstagramHomeUI();
                 break;
             case "profile":
-                newScreen = new InstagramProfileUI(new User(readLoggedInUsername()));
+                String username = readLoggedInUsername();
+                if (username != null && !username.isEmpty()) {
+                    newScreen = new InstagramProfileUI(username);
+                }
                 break;
             case "notification":
                 newScreen = new NotificationsUI();

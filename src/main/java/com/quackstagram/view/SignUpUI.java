@@ -1,5 +1,10 @@
+package com.quackstagram.view;
+
 import java.awt.event.ActionEvent;
 import javax.swing.*;
+
+import com.quackstagram.model.User;
+import com.quackstagram.service.UserService;
 
 public class SignUpUI extends AuthUI {
     private final UserService userService;
