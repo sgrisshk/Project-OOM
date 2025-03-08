@@ -1,3 +1,9 @@
+package com.quackstagram.controller;
+
+import com.quackstagram.model.User;
+import com.quackstagram.util.UserSession;
+import com.quackstagram.view.MessageUI;
+
 /**
  * Demo class to show how to access and use the messaging system UI
  */

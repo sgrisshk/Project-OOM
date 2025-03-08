@@ -1,3 +1,7 @@
+package com.quackstagram.service;
+
+import com.quackstagram.model.Message;
+import com.quackstagram.model.User;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -9,18 +13,25 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- * Service class for handling message operations in Quackstagram
+ * Service pour gérer les messages entre utilisateurs
  */
 public class MessageService {
     private static final String MESSAGES_FILE = "data/Messages.txt";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
     private static int nextMessageId = 1;
     
+    private static List<Message> allMessages = new ArrayList<>();
+    
     static {
         // Initialize nextMessageId by finding the highest ID in the file
         loadNextMessageId();
+    }
+    
+    private MessageService() {
+        // Constructeur privé pour empêcher l'instanciation
     }
     
     /**
@@ -78,88 +89,33 @@ public class MessageService {
     }
     
     /**
-     * Save a new message to the file
+     * Enregistre un nouveau message
      */
     public static Message saveMessage(User sender, User receiver, String content) {
-        // Create the message with a new ID
-        Message message = new Message(sender, receiver, content);
-        message.setMessageId(nextMessageId);
-        
-        // Format the message record
-        String messageRecord = String.format("%d|%s|%s|%s|%s|%b",
-                message.getMessageId(),
-                message.getTimestamp().format(DATE_FORMATTER),
-                sender.getUsername(),
-                receiver.getUsername(),
-                content.replace("|", "&#124;"), // Escape pipe characters in content
-                message.isRead());
-        
-        try (PrintWriter writer = new PrintWriter(new FileWriter(MESSAGES_FILE, true))) {
-            writer.println(messageRecord);
-            nextMessageId++;
-            return message;
-        } catch (IOException e) {
-            System.err.println("Error saving message: " + e.getMessage());
+        if (content == null || content.trim().isEmpty()) {
             return null;
         }
+        
+        Message message = new Message(sender, receiver, content);
+        allMessages.add(message);
+        return message;
     }
     
     /**
-     * Get the conversation between two users
+     * Récupère la conversation entre deux utilisateurs
      */
     public static List<Message> getConversation(User user1, User user2) {
-        List<Message> conversation = new ArrayList<>();
-        File messagesFile = new File(MESSAGES_FILE);
-        
-        if (!messagesFile.exists()) {
-            return conversation; // Empty list if file doesn't exist
-        }
-        
-        try (BufferedReader reader = new BufferedReader(new FileReader(MESSAGES_FILE))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                // Skip empty lines and comment lines
-                if (line.trim().isEmpty() || line.startsWith("#")) {
-                    continue;
-                }
-                
-                String[] parts = line.split("\\|");
-                if (parts.length >= 6) {
-                    String sender = parts[2];
-                    String receiver = parts[3];
-                    
-                    // Check if this message is part of the conversation between the two users
-                    if ((sender.equals(user1.getUsername()) && receiver.equals(user2.getUsername())) ||
-                        (sender.equals(user2.getUsername()) && receiver.equals(user1.getUsername()))) {
-                        
-                        // Parse the message data
-                        int id = Integer.parseInt(parts[0]);
-                        LocalDateTime timestamp = LocalDateTime.parse(parts[1], DATE_FORMATTER);
-                        String content = parts[4].replace("&#124;", "|"); // Unescape pipe characters
-                        boolean isRead = Boolean.parseBoolean(parts[5]);
-                        
-                        // Create a message object
-                        Message message = new Message(
-                            id,
-                            new User(sender),
-                            new User(receiver),
-                            content,
-                            timestamp,
-                            isRead
-                        );
-                        
-                        conversation.add(message);
-                    }
-                }
-            }
-        } catch (IOException e) {
-            System.err.println("Error loading conversation: " + e.getMessage());
-        }
-        
-        // Sort the conversation by timestamp
-        conversation.sort(Comparator.comparing(Message::getTimestamp));
-        
-        return conversation;
+        return allMessages.stream()
+                .filter(m -> (m.getSender().equals(user1) && m.getReceiver().equals(user2)) || 
+                             (m.getSender().equals(user2) && m.getReceiver().equals(user1)))
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * Récupère tous les messages
+     */
+    public static List<Message> getAllMessages() {
+        return new ArrayList<>(allMessages);
     }
     
     /**

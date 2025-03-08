@@ -1,33 +1,64 @@
+package com.quackstagram.model;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-// Represents a picture on Quackstagram
-class Picture {
-    private String imagePath;
+/**
+ * Représente une image publiée par un utilisateur
+ */
+public class Picture {
+    private String filePath;
     private String caption;
-    private int likesCount;
-    private List<String> comments;
-
-    public Picture(String imagePath, String caption) {
-        this.imagePath = imagePath;
+    private LocalDateTime timestamp;
+    private User owner;
+    private List<String> likedBy;
+    
+    public Picture(String filePath, String caption, User owner) {
+        this.filePath = filePath;
         this.caption = caption;
-        this.likesCount = 0;
-        this.comments = new ArrayList<>();
+        this.owner = owner;
+        this.timestamp = LocalDateTime.now();
+        this.likedBy = new ArrayList<>();
     }
-
-    // Add a comment to the picture
-    public void addComment(String comment) {
-        comments.add(comment);
+    
+    public String getFilePath() {
+        return filePath;
     }
-
-    // Increment likes count
-    public void like() {
-        likesCount++;
+    
+    public String getCaption() {
+        return caption;
     }
-
-    // Getter methods for picture details
-    public String getImagePath() { return imagePath; }
-    public String getCaption() { return caption; }
-    public int getLikesCount() { return likesCount; }
-    public List<String> getComments() { return comments; }
+    
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+    
+    public User getOwner() {
+        return owner;
+    }
+    
+    public int getLikesCount() {
+        return likedBy.size();
+    }
+    
+    public void addLike(String username) {
+        if (!likedBy.contains(username)) {
+            likedBy.add(username);
+        }
+    }
+    
+    public void removeLike(String username) {
+        likedBy.remove(username);
+    }
+    
+    public boolean isLikedBy(String username) {
+        return likedBy.contains(username);
+    }
+    
+    @Override
+    public String toString() {
+        return String.format("%s (by %s) - %d likes", 
+                caption, owner.getUsername(), getLikesCount());
+    }
 }

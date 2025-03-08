@@ -1,8 +1,11 @@
+package com.quackstagram.model;
+
 import java.util.ArrayList;
 import java.util.List;
+import com.quackstagram.service.MessageService;
 
 // Represents a user on Quackstagram
-class User {
+public class User {
     private String username;
     private String bio;
     private String password;

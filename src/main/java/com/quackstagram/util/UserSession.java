@@ -1,3 +1,5 @@
+package com.quackstagram.util;
+
 /**
  * A simple class to track the currently logged in user
  * This uses the Singleton pattern to ensure there's only one session throughout the app

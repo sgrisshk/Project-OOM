@@ -1,3 +1,5 @@
+package com.quackstagram.view;
+
 import java.awt.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -5,6 +7,10 @@ import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javax.swing.*;
+
+import com.quackstagram.model.Message;
+import com.quackstagram.model.User;
+import com.quackstagram.service.MessageService;
 
 /**
  * A simple UI for the messaging system in Quackstagram
