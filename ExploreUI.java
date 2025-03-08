@@ -18,7 +18,7 @@ public class ExploreUI extends BaseUI {
     private static final int IMAGE_SIZE = WIDTH / 3;
 
     public ExploreUI() {
-        super("Quackstagram - Explore");
+        super("Explore");
         getContentPane().removeAll();
         setLayout(new BorderLayout());
 

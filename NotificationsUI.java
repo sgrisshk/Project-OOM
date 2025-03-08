@@ -1,4 +1,4 @@
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -6,12 +6,17 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import javax.swing.*;
+
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 public class NotificationsUI extends NavigateUI {
 
     public NotificationsUI() {
-        super("Quackstagram - Notifications");
+        super("Notifications");
         initializeUI();
     }
 

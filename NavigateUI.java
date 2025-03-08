@@ -4,6 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public abstract class NavigateUI extends BaseUI {
+
     public NavigateUI(String title) {
         super(title);
     }
