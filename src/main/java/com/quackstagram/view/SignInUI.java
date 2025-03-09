@@ -1,16 +1,13 @@
 package com.quackstagram.view;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import com.quackstagram.service.UserService;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+
+import javax.swing.SwingUtilities;
+
 import com.quackstagram.model.User;
+import com.quackstagram.service.UserService;
 import com.quackstagram.util.UserSession;
-import com.quackstagram.util.DialogUtils;
-import com.quackstagram.util.NavigationUtils;
-import com.quackstagram.view.ChangePasswordUI;
-import com.quackstagram.view.InstagramProfileUI;
-import com.quackstagram.view.SignUpUI;
 
 public class SignInUI extends AuthUI {
     private static final Color PRIMARY_COLOR = new Color(255, 90, 95);

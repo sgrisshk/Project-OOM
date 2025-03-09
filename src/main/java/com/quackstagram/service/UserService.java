@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import com.quackstagram.model.User;
 
 public class UserService implements UserServiceInterface {
@@ -20,17 +21,29 @@ public class UserService implements UserServiceInterface {
     }
 
     public void loadUsers() {
-        try{ BufferedReader reader = new BufferedReader(new FileReader(credentialsFilePath));
+        try { 
+            BufferedReader reader = new BufferedReader(new FileReader(credentialsFilePath));
             String line;
             while((line = reader.readLine()) != null){
+                if (line.trim().isEmpty()) {
+                    continue; // Skip empty lines
+                }
+                
                 String[] credentials = line.split(":");
-                String username = credentials[0];
-                users.add(new User(username));
+                if (credentials.length > 0) {
+                    String username = credentials[0];
+                    String bio = credentials.length > 2 ? credentials[2] : "";
+                    String password = credentials.length > 1 ? credentials[1] : "";
+                    
+                    // Create user with full info if available
+                    User user = new User(username, bio, password);
+                    users.add(user);
+                }
             }
+            reader.close();
         } catch (IOException e) {
-            System.out.println("credentials file not found");
+            System.out.println("Credentials file not found: " + e.getMessage());
         }
-
     }
 
     public boolean userExists(String username) {
@@ -55,8 +68,13 @@ public class UserService implements UserServiceInterface {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] credentials = line.split(":");
-                if (credentials[0].equals(username)) {
-                    return credentials[1];
+                if (credentials.length > 0 && credentials[0].equals(username)) {
+                    // Make sure there's actually a password at index 1
+                    if (credentials.length > 1) {
+                        return credentials[1];
+                    } else {
+                        return ""; // Return empty string if no password set
+                    }
                 }
             }
         }
@@ -147,13 +165,19 @@ public class UserService implements UserServiceInterface {
         
         // Check if password matches
         try {
-            if (getPassword(username).equals(password)) {
+            String storedPassword = getPassword(username);
+            // Handle null or empty passwords
+            if (storedPassword == null) {
+                throw new IllegalArgumentException("User has no password set");
+            }
+            
+            if (storedPassword.equals(password)) {
                 return getUserByUsername(username);
             } else {
                 throw new IllegalArgumentException("Invalid password");
             }
         } catch (IOException e) {
-            throw new IllegalArgumentException("Error accessing user data");
+            throw new IllegalArgumentException("Error accessing user data: " + e.getMessage());
         }
     }
     

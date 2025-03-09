@@ -1,7 +1,10 @@
 package com.quackstagram.network;
 
-import java.io.*;
-import java.net.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
 
 public class Client implements Runnable{
     private Socket socket;
@@ -24,10 +27,12 @@ public class Client implements Runnable{
                 try{
                     BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
                     String message;
-                    
+                    // Add code to handle input
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }   
-    }
+        }
     }
 }   
 

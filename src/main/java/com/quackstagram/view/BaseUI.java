@@ -1,23 +1,37 @@
 package com.quackstagram.view;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.function.Supplier;
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.border.LineBorder;
 
 import com.quackstagram.model.User;
-import com.quackstagram.view.InstagramProfileUI;
-import com.quackstagram.view.QuakstagramHomeUI;
-import com.quackstagram.view.NotificationsUI;
-import com.quackstagram.view.ExploreUI;
-import com.quackstagram.view.ImageUploadUI;
+import com.quackstagram.util.UserSession;
 
 public abstract class BaseUI extends JFrame {
     protected static final int WIDTH = 300;
@@ -78,7 +92,8 @@ public abstract class BaseUI extends JFrame {
             case "profile":
                 String username = readLoggedInUsername();
                 if (username != null && !username.isEmpty()) {
-                    newScreen = new InstagramProfileUI(username);
+                    User user = new User(username, "", "");
+                    newScreen = new InstagramProfileUI(user);
                 }
                 break;
             case "notification":
@@ -99,13 +114,9 @@ public abstract class BaseUI extends JFrame {
     }
 
     protected String readLoggedInUsername() {
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get("data", "users.txt"))) {
-            String line = reader.readLine();
-            return line != null ? line.split(":")[0].trim() : "";
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "";
-        }
+        // Get the currently logged in user from UserSession
+        String username = UserSession.getInstance().getCurrentUsername();
+        return username != null ? username : "";
     }
 
     protected JPanel createHeaderPanel(String headerText) {

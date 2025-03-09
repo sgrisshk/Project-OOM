@@ -1,19 +1,18 @@
 package com.quackstagram.service;
 
-import com.quackstagram.model.Message;
-import com.quackstagram.model.User;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.quackstagram.model.Message;
+import com.quackstagram.model.User;
 
 /**
  * Service pour gérer les messages entre utilisateurs
@@ -119,49 +118,15 @@ public class MessageService {
     }
     
     /**
-     * Mark a message as read
+     * Marque un message comme lu
      */
-    public static boolean markMessageAsRead(int messageId) {
-        List<String> allLines = new ArrayList<>();
-        boolean found = false;
-        
-        // Read all lines from the file
-        try (BufferedReader reader = new BufferedReader(new FileReader(MESSAGES_FILE))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.trim().isEmpty() || line.startsWith("#")) {
-                    allLines.add(line); // Keep comments and empty lines as is
-                    continue;
-                }
-                
-                String[] parts = line.split("\\|");
-                if (parts.length >= 6 && Integer.parseInt(parts[0]) == messageId) {
-                    // This is the message we want to mark as read
-                    parts[5] = "true";
-                    allLines.add(String.join("|", parts));
-                    found = true;
-                } else {
-                    allLines.add(line);
-                }
-            }
-        } catch (IOException e) {
-            System.err.println("Error reading messages file: " + e.getMessage());
-            return false;
-        }
-        
-        if (found) {
-            // Write the updated lines back to the file
-            try (PrintWriter writer = new PrintWriter(new FileWriter(MESSAGES_FILE))) {
-                for (String line : allLines) {
-                    writer.println(line);
-                }
-                return true;
-            } catch (IOException e) {
-                System.err.println("Error updating messages file: " + e.getMessage());
+    public static void markMessageAsRead(String messageId) {
+        for (Message message : allMessages) {
+            if (message.getMessageId().equals(messageId)) {
+                message.setRead(true);
+                break;
             }
         }
-        
-        return false;
     }
     
     /**

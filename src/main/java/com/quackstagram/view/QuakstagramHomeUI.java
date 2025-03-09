@@ -1,10 +1,18 @@
 package com.quackstagram.view;
 
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -18,13 +26,23 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.imageio.ImageIO;
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
 
 import com.quackstagram.model.User;
 
 public class QuakstagramHomeUI extends BaseUI {
-    // UI dimensions
+    // Dimensions
     private static final int WIDTH = 360;
     private static final int HEIGHT = 600;
     private static final int NAV_ICON_SIZE = 24;
@@ -39,13 +57,13 @@ public class QuakstagramHomeUI extends BaseUI {
     private static final Color TEXT_COLOR = new Color(50, 50, 50);
     private static final Color POST_BACKGROUND = new Color(255, 255, 255);
     
-    // UI components
+    // UI 
     private CardLayout cardLayout;
     private JPanel cardPanel;
     private JPanel homePanel;
     private JPanel imageViewPanel;
     
-    // Track liked posts
+    // Array list to store liked posts
     private List<String> likedPosts = new ArrayList<>();
     
 
@@ -55,9 +73,7 @@ public class QuakstagramHomeUI extends BaseUI {
         setMinimumSize(new Dimension(WIDTH, HEIGHT));
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
-        
-        // Set up card layout for switching between home and image view
-        cardLayout = new CardLayout();
+                cardLayout = new CardLayout();
         cardPanel = new JPanel(cardLayout);
         cardPanel.setBackground(BACKGROUND_COLOR);
         
@@ -66,11 +82,8 @@ public class QuakstagramHomeUI extends BaseUI {
         
         imageViewPanel = new JPanel(new BorderLayout());
         imageViewPanel.setBackground(BACKGROUND_COLOR);
-        
-        // Load liked posts
-        loadLikedPosts();
+                loadLikedPosts();
 
-        // Initialize UI components and add to layout
         setupHomePanel();
         cardPanel.add(homePanel, "Home");
         cardPanel.add(imageViewPanel, "ImageView");
@@ -79,28 +92,21 @@ public class QuakstagramHomeUI extends BaseUI {
         cardLayout.show(cardPanel, "Home");
         JButton messageButton = createIconButton("img/icons/message.png");
 
-        // Add header and navigation
         JPanel headerPanel = createHeaderPanel("Quackstagram");
         headerPanel.setBackground(HEADER_COLOR);
         headerPanel.setForeground(Color.WHITE);
         
-        // Add message icon to the header panel
         messageButton.addActionListener(e -> {
-            // Get current user and open MessageUI
             String username = getCurrentUser();
             User currentUser = new User(username);
             MessageUI.showMessagesFor(currentUser);
         });
         
-        // Change layout to BorderLayout to position the message icon on the right
         headerPanel.setLayout(new BorderLayout());
-        // Move the existing title to the center
         JLabel titleLabel = new JLabel("Quackstagram 🐥", JLabel.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
         titleLabel.setForeground(Color.WHITE);
         headerPanel.add(titleLabel, BorderLayout.CENTER);
-        
-        // Add message button to the right
         JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         rightPanel.setBackground(HEADER_COLOR);
         rightPanel.add(messageButton);
@@ -115,31 +121,27 @@ public class QuakstagramHomeUI extends BaseUI {
         likedPosts.clear();
         String currentUser = getCurrentUser();
         
-        // Check notifications.txt for likes by current user
         try (BufferedReader reader = Files.newBufferedReader(Paths.get("data", "notifications.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split("; ");
                 if (parts.length >= 3 && parts[1].equals(currentUser)) {
-                    likedPosts.add(parts[2]); // Add the imageId to liked posts
+                    likedPosts.add(parts[2]); 
                 }
             }
         } catch (IOException e) {
-            // If file doesn't exist yet, that's fine - just start with empty likes
         }
     }
     
 
     private String getCurrentUser() {
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get("data", "users.txt"))) {
-            String line = reader.readLine();
-            if (line != null) {
-                return line.split(":")[0].trim();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        String username = com.quackstagram.util.UserSession.getInstance().getCurrentUsername();
+        
+        if (username == null || username.isEmpty()) {
+            return "";
         }
-        return "";
+        
+        return username;
     }
 
 
@@ -154,7 +156,6 @@ public class QuakstagramHomeUI extends BaseUI {
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         
-        // Load posts and populate content panel
         String[][] posts = loadPosts();
         for (String[] post : posts) {
             createPostItem(contentPanel, post);
@@ -167,7 +168,6 @@ public class QuakstagramHomeUI extends BaseUI {
         String currentUser = "";
         String followedUsers = "";
         
-        // Get current user
         try (BufferedReader reader = Files.newBufferedReader(Paths.get("data", "users.txt"))) {
             String line = reader.readLine();
             if (line != null) {
@@ -177,7 +177,6 @@ public class QuakstagramHomeUI extends BaseUI {
             e.printStackTrace();
         }
         
-        // Get followed users
         try (BufferedReader reader = Files.newBufferedReader(Paths.get("data", "following.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -190,7 +189,6 @@ public class QuakstagramHomeUI extends BaseUI {
             e.printStackTrace();
         }
         
-        // Load posts from image_details.txt
         String[][] tempData = new String[100][];
         int count = 0;
         
@@ -212,7 +210,6 @@ public class QuakstagramHomeUI extends BaseUI {
             e.printStackTrace();
         }
         
-        // Create final array with correct size
         String[][] posts = new String[count][];
         System.arraycopy(tempData, 0, posts, 0, count);
         
@@ -227,7 +224,6 @@ public class QuakstagramHomeUI extends BaseUI {
         String imageId = new File(imagePath).getName().split("\\.")[0];
         boolean isLiked = likedPosts.contains(imageId);
         
-        // Create post panel
         JPanel postPanel = new JPanel();
         postPanel.setLayout(new BoxLayout(postPanel, BoxLayout.Y_AXIS));
         postPanel.setBackground(POST_BACKGROUND);
@@ -237,7 +233,6 @@ public class QuakstagramHomeUI extends BaseUI {
         ));
         postPanel.setAlignmentX(CENTER_ALIGNMENT);
         
-        // Add username
         JLabel usernameLabel = new JLabel(username);
         usernameLabel.setFont(new Font("Arial", Font.BOLD, 14));
         usernameLabel.setForeground(TEXT_COLOR);
@@ -245,8 +240,6 @@ public class QuakstagramHomeUI extends BaseUI {
         usernamePanel.setBackground(POST_BACKGROUND);
         usernamePanel.add(usernameLabel);
         postPanel.add(usernamePanel);
-        
-        // Add spacing
         postPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         
         // Add image
