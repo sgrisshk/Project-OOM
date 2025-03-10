@@ -1,3 +1,5 @@
+package com.quackstagram.service;
+
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
