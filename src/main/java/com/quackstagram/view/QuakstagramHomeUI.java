@@ -584,7 +584,7 @@ public class QuakstagramHomeUI extends BaseUI {
                 new QuakstagramHomeUI().setVisible(true);
                 break;
             case "explore":
-                new ExploreUI().setVisible(true);
+                new ExploreUI(null).setVisible(true);
                 break;
             case "upload":
                 new ImageUploadUI().setVisible(true);

@@ -1,5 +1,4 @@
 package com.quackstagram.view;
-
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -15,31 +14,37 @@ import java.time.temporal.ChronoUnit;
 import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import com.quackstagram.search.*;
 
 import com.quackstagram.model.User;
 
 public class ExploreUI extends BaseUI {
     private static final int IMAGE_SIZE = WIDTH / 3;
-
-    public ExploreUI() {
+    private final String credentialsFilePath ="data/credentials.txt";
+    private final String imageFilePath ="img/image_details.txt";
+    public ExploreUI(Search filter) {
         super("Explore");
         getContentPane().removeAll();
         setLayout(new BorderLayout());
 
         add(createHeaderPanel("Explore"), BorderLayout.NORTH);
-        add(createMainContentPanel(), BorderLayout.CENTER);
+        add(createMainContentPanel(filter), BorderLayout.CENTER);
         add(createNavigationPanel(), BorderLayout.SOUTH);
 
         revalidate();
         repaint();
     }
 
-    private JPanel createMainContentPanel() {
+    private JPanel createMainContentPanel(Search filter) {
         // Search bar at the top
         JPanel searchPanel = new JPanel(new BorderLayout());
         JTextField searchField = new JTextField(" Search Users");
         searchPanel.add(searchField, BorderLayout.CENTER);
         searchPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, searchField.getPreferredSize().height));
+        searchField.addActionListener(e -> {
+            String searchText = searchField.getText();
+            parseImageData(searchText);
+        });
 
 
         JPanel imageGridPanel = new JPanel(new GridLayout(0, 3, 2, 2));
@@ -49,17 +54,27 @@ public class ExploreUI extends BaseUI {
             File[] imageFiles = imageDir.listFiles((dir, name) -> name.matches(".*\\.(png|jpg|jpeg)"));
             if (imageFiles != null) {
                 for (File imageFile : imageFiles) {
-                    ImageIcon imageIcon = new ImageIcon(new ImageIcon(imageFile.getPath())
-                            .getImage()
-                            .getScaledInstance(IMAGE_SIZE, IMAGE_SIZE, Image.SCALE_SMOOTH));
-                    JLabel imageLabel = new JLabel(imageIcon);
-                    imageLabel.addMouseListener(new MouseAdapter() {
-                        @Override
-                        public void mouseClicked(MouseEvent e) {
-                            displayImage(imageFile.getPath());
-                        }
-                    });
-                    imageGridPanel.add(imageLabel);
+                    boolean addImage=true;
+                    if(filter != null){
+                        String fileName = imageFile.getName();
+                        String filewithoutExtension = fileName.substring(0, fileName.lastIndexOf("."));
+                        addImage = filter.checkToAdd(filewithoutExtension);
+                    }
+                    if (addImage) {
+                        ImageIcon imageIcon = new ImageIcon(new ImageIcon(imageFile.getPath())
+                                .getImage()
+                                .getScaledInstance(IMAGE_SIZE, IMAGE_SIZE, Image.SCALE_SMOOTH));
+                        JLabel imageLabel = new JLabel(imageIcon);
+                        imageLabel.addMouseListener(new MouseAdapter() {
+                            @Override
+                            public void mouseClicked(MouseEvent e) {
+                                displayImage(imageFile.getPath());
+                            }
+                        });
+                        imageGridPanel.add(imageLabel);
+                    }
+
+
                 }
             }
         }
@@ -73,6 +88,43 @@ public class ExploreUI extends BaseUI {
         mainContentPanel.add(searchPanel);
         mainContentPanel.add(scrollPane);
         return mainContentPanel;
+    }
+    private void parseImageData(String searchText) {
+        char first = searchText.charAt(0);
+        searchText = searchText.substring(1);
+        if(first == '@') {
+            SearchName finduser = new SearchName(searchText);
+            finduser.findSearchText(searchText, credentialsFilePath);
+            if (!finduser.ret.isEmpty()){
+                loadProfile(finduser.ret.getFirst());
+            }
+        }
+        if(first == '#') {
+            SearchHashtag findhash = new SearchHashtag(searchText);
+            findhash.findSearchText(searchText, imageFilePath);
+            JFrame newScreen=new ExploreUI(findhash);
+            if (newScreen != null) {
+                this.dispose();
+                newScreen.setVisible(true);
+            }
+
+        }
+        if(first == '/') {
+            SearchUsersPhotos findphotos = new SearchUsersPhotos(searchText);
+            findphotos.findSearchText(searchText, imageFilePath);
+            JFrame newScreen=new ExploreUI(findphotos);
+            if (newScreen != null) {
+                this.dispose();
+                newScreen.setVisible(true);
+            }
+        }
+    }
+
+    private void loadProfile(String first) {
+        User user = new User(first);
+        InstagramProfileUI profileUI = new InstagramProfileUI(user);
+        profileUI.setVisible(true);
+        dispose();
     }
 
     private void displayImage(String imagePath) {
@@ -157,7 +209,7 @@ public class ExploreUI extends BaseUI {
 
         backButton.addActionListener(e -> {
             getContentPane().removeAll();
-            add(createMainContentPanel(), BorderLayout.CENTER);
+            add(createMainContentPanel(null), BorderLayout.CENTER);
             add(createNavigationPanel(), BorderLayout.SOUTH);
             revalidate();
             repaint();
@@ -165,10 +217,7 @@ public class ExploreUI extends BaseUI {
         final String finalUsername = username;
 
         usernameLabel.addActionListener(e -> {
-            User user = new User(finalUsername);
-            InstagramProfileUI profileUI = new InstagramProfileUI(user);
-            profileUI.setVisible(true);
-            dispose();
+            loadProfile(finalUsername);
         });
 
 

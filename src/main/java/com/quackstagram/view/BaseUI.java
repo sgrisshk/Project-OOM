@@ -100,7 +100,7 @@ public abstract class BaseUI extends JFrame {
                 newScreen = new NotificationsUI();
                 break;
             case "explore":
-                newScreen = new ExploreUI();
+                newScreen = new ExploreUI(null);
                 break;
             case "add":
                 newScreen = new ImageUploadUI();

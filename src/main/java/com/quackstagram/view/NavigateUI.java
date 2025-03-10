@@ -36,7 +36,7 @@ public abstract class NavigateUI extends BaseUI {
     private void exploreUI() {
         // Open InstagramProfileUI frame
         this.dispose();
-        ExploreUI explore = new ExploreUI();
+        ExploreUI explore = new ExploreUI(null);
         explore.setVisible(true);
     }
 
