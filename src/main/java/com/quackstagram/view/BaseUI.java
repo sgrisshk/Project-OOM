@@ -30,7 +30,6 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
 
-import com.quackstagram.model.User;
 import com.quackstagram.util.UserSession;
 
 public abstract class BaseUI extends JFrame {
@@ -65,7 +64,7 @@ public abstract class BaseUI extends JFrame {
         navigationPanel.add(Box.createHorizontalGlue());
         navigationPanel.add(createIconButton("img/icons/add.png", "add"));
         navigationPanel.add(Box.createHorizontalGlue());
-        navigationPanel.add(createIconButton("img/icons/heart.png", "notification"));
+        navigationPanel.add(createIconButton("img/icons/heart.png", "notifications"));
         navigationPanel.add(Box.createHorizontalGlue());
         navigationPanel.add(createIconButton("img/icons/profile.png", "profile"));
 
@@ -84,33 +83,11 @@ public abstract class BaseUI extends JFrame {
     }
 
     protected void navigateToScreen(String screenType) {
-        JFrame newScreen = null;
-        switch (screenType) {
-            case "home":
-                newScreen = new QuakstagramHomeUI();
-                break;
-            case "profile":
-                String username = readLoggedInUsername();
-                if (username != null && !username.isEmpty()) {
-                    User user = new User(username, "", "");
-                    newScreen = new InstagramProfileUI(user);
-                }
-                break;
-            case "notification":
-                newScreen = new NotificationsUI();
-                break;
-            case "explore":
-                newScreen = new ExploreUI(null);
-                break;
-            case "add":
-                newScreen = new ImageUploadUI();
-                break;
-        }
-
-        if (newScreen != null) {
-            this.dispose();
-            newScreen.setVisible(true);
-        }
+        // Dispose this frame
+        this.dispose();
+        
+        // Use the standalone NavigationUtils class to handle navigation
+        com.quackstagram.util.NavigationUtils.navigateTo(screenType);
     }
 
     protected String readLoggedInUsername() {

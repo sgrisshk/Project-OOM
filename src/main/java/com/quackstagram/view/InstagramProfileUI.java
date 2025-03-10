@@ -11,7 +11,6 @@ import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,6 +29,8 @@ import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 
 import com.quackstagram.model.User;
+import com.quackstagram.service.UserService;
+import com.quackstagram.util.UserSession;
 
 public class InstagramProfileUI extends BaseUI {
 
@@ -50,7 +51,7 @@ public class InstagramProfileUI extends BaseUI {
             initializeUI();
         } catch (Exception e) {
             e.printStackTrace();
-            // Gérer l'erreur de chargement de l'utilisateur
+            // Handle user loading error
         }
     }
 
@@ -66,12 +67,14 @@ public class InstagramProfileUI extends BaseUI {
     }
 
     private void initializeUI() {
-        getContentPane().removeAll(); // Clear existing components
-
-        // Initialize the following count by reading from following.txt
-        updateFollowingCount();
+        getContentPane().removeAll(); // clear everything first
         
-        // Créer les panels s'ils sont null
+        // Need to get follower counts first
+        // still working on this - fix bugs later
+        updateFollowingCount();        
+        updateFollowerCount();
+        
+        // Make the panels if they don't exist yet
         if (headerPanel == null) {
             headerPanel = createHeaderPanel();
         }
@@ -80,13 +83,14 @@ public class InstagramProfileUI extends BaseUI {
             navigationPanel = createNavigationPanel();
         }
 
-        // Re-add the header and navigation panels
+        // Put everything in the right place
         add(headerPanel, BorderLayout.NORTH);
         add(navigationPanel, BorderLayout.SOUTH);
 
-        // Initialize the image grid
+        // Set up the grid of images
         initializeImageGrid();
 
+        // Update the screen
         revalidate();
         repaint();
     }
@@ -116,6 +120,12 @@ public class InstagramProfileUI extends BaseUI {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void updateFollowerCount() {
+        // Use the UserService to update the follower count
+        UserService userService = new UserService();
+        userService.updateFollowerCount(currentUser);
     }
 
     private JPanel createHeaderPanel() {
@@ -248,56 +258,26 @@ public class InstagramProfileUI extends BaseUI {
 
 
     private void handleFollowAction(String usernameToFollow) {
-        Path followingFilePath = Paths.get("data", "following.txt");
-        Path usersFilePath = Paths.get("data", "users.txt");
-        String currentUserUsername = "";
-
-        try {
-            // Read the current user's username from users.txt
-            try (BufferedReader reader = Files.newBufferedReader(usersFilePath)) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    String[] parts = line.split(":");
-                    currentUserUsername = parts[0];
-                }
-            }
-
-            System.out.println("Real user is "+currentUserUsername);
-            // If currentUserUsername is not empty, process following.txt
-            if (!currentUserUsername.isEmpty()) {
-                boolean found = false;
-                StringBuilder newContent = new StringBuilder();
-
-                // Read and process following.txt
-                if (Files.exists(followingFilePath)) {
-                    try (BufferedReader reader = Files.newBufferedReader(followingFilePath)) {
-                        String line;
-                        while ((line = reader.readLine()) != null) {
-                            String[] parts = line.split(":");
-                            if (parts[0].trim().equals(currentUserUsername)) {
-                                found = true;
-                                if (!line.contains(usernameToFollow)) {
-                                    line = line.concat(line.endsWith(":") ? "" : "; ").concat(usernameToFollow);
-                                }
-                            }
-                            newContent.append(line).append("\n");
-                        }
-                    }
-                }
-
-                // If the current user was not found in following.txt, add them
-                if (!found) {
-                    newContent.append(currentUserUsername).append(": ").append(usernameToFollow).append("\n");
-                }
-
-                // Write the updated content back to following.txt
-                try (BufferedWriter writer = Files.newBufferedWriter(followingFilePath)) {
-                    writer.write(newContent.toString());
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        String currentUsername = UserSession.getInstance().getCurrentUsername();
+        if (currentUsername == null || currentUsername.isEmpty()) {
+            System.out.println("Error: No user is currently logged in");
+            return;
         }
+
+        UserService userService = new UserService();
+        userService.followUser(currentUsername, usernameToFollow);
+        
+        // Update the UI
+        updateFollowingCount();
+        
+        // Update follower count for the user being followed
+        User followedUser = userService.getUserByUsername(usernameToFollow);
+        if (followedUser != null) {
+            userService.updateFollowerCount(followedUser);
+        }
+        
+        revalidate();
+        repaint();
     }
 
 

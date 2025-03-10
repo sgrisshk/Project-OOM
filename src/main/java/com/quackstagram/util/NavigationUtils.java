@@ -38,7 +38,7 @@ public class NavigationUtils {
             case "explore":
                 nextScreen = new ExploreUI(null);
                 break;
-            case "upload":
+            case "add":
                 nextScreen = new ImageUploadUI();
                 break;
             case "notifications":

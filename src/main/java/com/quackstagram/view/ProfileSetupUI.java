@@ -1,9 +1,11 @@
 package com.quackstagram.view;
 
-import java.awt.event.*;
-import javax.swing.*;
-import com.quackstagram.service.UserService;
+import java.awt.event.ActionEvent;
+
+import javax.swing.JOptionPane;
+
 import com.quackstagram.model.User;
+import com.quackstagram.service.UserService;
 
 public class ProfileSetupUI extends AuthUI {
     private final UserService userService;
@@ -47,6 +49,10 @@ public class ProfileSetupUI extends AuthUI {
         try {
             // Update the user's bio
             currentUser.setBio(bio);
+            
+            // Update follower count
+            userService.updateFollowerCount(currentUser);
+            
             userService.saveUser(currentUser);
             
             // Navigate to main app

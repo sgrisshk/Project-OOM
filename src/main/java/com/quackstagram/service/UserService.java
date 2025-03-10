@@ -13,6 +13,7 @@ import com.quackstagram.model.User;
 public class UserService implements UserServiceInterface {
     private List<User> users;
     private String credentialsFilePath = "data/credentials.txt";
+    private String followingFilePath = "data/following.txt";
     
     // Constructor
     public UserService() {
@@ -126,23 +127,29 @@ public class UserService implements UserServiceInterface {
         }
     }
     
+    private void initializeFollowingEntry(String username) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(followingFilePath, true))) {
+            writer.write(username + ":");  // Initialize with empty following list
+            writer.newLine();
+        } catch (IOException e) {
+            System.out.println("Error initializing following entry: " + e.getMessage());
+        }
+    }
+    
     @Override
     public User registerUser(String username, String password, String bio) {
-        try{
-            userExists(username);
-        }
-        catch (Exception e) {
+        if (userExists(username)) {
             throw new IllegalArgumentException("Username already exists");
         }
-        try{
-            User newUser = new User(username, password, bio);
-            users.add(newUser); 
+        
+        try {
+            User newUser = new User(username, bio, password);
+            users.add(newUser);
             saveUser(newUser);
-       
+            initializeFollowingEntry(username);  // Initialize following entry
             return newUser;
-        }
-        catch (Exception e) {
-            throw new IllegalArgumentException("Username already exists");
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error creating user: " + e.getMessage());
         }
     }
     
@@ -168,4 +175,101 @@ public class UserService implements UserServiceInterface {
         }
     }
     
+  public void followUser(String follower, String followed) {
+        try {
+            // Read all current following relationships
+            List<String> lines = new ArrayList<>();
+            boolean updated = false;
+            
+            try (BufferedReader reader = new BufferedReader(new FileReader(followingFilePath))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (line.startsWith(follower + ":")) {
+                        // Update the follower's line
+                        String[] parts = line.split(":");
+                        String following = parts.length > 1 ? parts[1] : "";
+                        if (!following.isEmpty()) {
+                            // Add to existing following list
+                            lines.add(follower + ":" + following + "; " + followed);
+                        } else {
+                            // Create new following list
+                            lines.add(follower + ":" + followed);
+                        }
+                        updated = true;
+                    } else {
+                        lines.add(line);
+                    }
+                }
+            }
+            
+            // If the follower wasn't found, add a new entry
+            if (!updated) {
+                lines.add(follower + ":" + followed);
+            }
+            
+            // Write back all relationships
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(followingFilePath))) {
+                for (String line : lines) {
+                    writer.write(line);
+                    writer.newLine();
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error updating following relationship: " + e.getMessage());
+        }
+    }
+
+    public List<String> getFollowing(String username) {
+        List<String> following = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(followingFilePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith(username + ":")) {
+                    String[] parts = line.split(":");
+                    if (parts.length > 1 && !parts[1].isEmpty()) {
+                        String[] followedUsers = parts[1].split(";");
+                        for (String user : followedUsers) {
+                            following.add(user.trim());
+                        }
+                    }
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading following relationships: " + e.getMessage());
+        }
+        return following;
+    }
+
+    public boolean isFollowing(String follower, String followed) {
+        List<String> following = getFollowing(follower);
+        return following.contains(followed);
+    }
+
+    public int getFollowerCount(String username) {
+        int followerCount = 0;
+        try (BufferedReader reader = new BufferedReader(new FileReader(followingFilePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(":");
+                if (parts.length > 1 && !parts[0].equals(username)) {
+                    String[] followedUsers = parts[1].split(";");
+                    for (String user : followedUsers) {
+                        if (user.trim().equals(username)) {
+                            followerCount++;
+                            break;
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading following relationships: " + e.getMessage());
+        }
+        return followerCount;
+    }
+
+    public void updateFollowerCount(User user) {
+        int followerCount = getFollowerCount(user.getUsername());
+        user.setFollowersCount(followerCount);
+    }
 }

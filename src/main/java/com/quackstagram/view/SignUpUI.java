@@ -1,7 +1,8 @@
 package com.quackstagram.view;
 
 import java.awt.event.ActionEvent;
-import javax.swing.*;
+
+import javax.swing.JOptionPane;
 
 import com.quackstagram.model.User;
 import com.quackstagram.service.UserService;
@@ -27,7 +28,7 @@ public class SignUpUI extends AuthUI {
 
     private void onRegisterClicked(ActionEvent e) {
         String username = txtUsername.getText();
-        String password = txtPassword.getText();
+        String password = new String(txtPassword.getPassword());
 
         try {
             // Register with empty bio first

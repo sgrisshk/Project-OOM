@@ -131,7 +131,7 @@ public class MessageUI extends JFrame {
                     // Extract the users that the current user is following
                     String[] parts = line.split(":");
                     if (parts.length > 1 && !parts[1].isEmpty()) {
-                        String[] following = parts[1].split(",");
+                        String[] following = parts[1].split(";");
                         for (String username : following) {
                             contactsModel.addElement(username.trim());
                         }

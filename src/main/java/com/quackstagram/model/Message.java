@@ -2,7 +2,7 @@ package com.quackstagram.model;
 
 import java.time.LocalDateTime;
 
-//Représente un message entre deux utilisateurs
+//This is a message between two users
  
 public class Message {
     private User sender;

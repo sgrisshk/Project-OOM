@@ -9,8 +9,6 @@ import java.util.List;
 public class UserRelationshipManager {
 
     private final String followersFilePath = "data/followers.txt";
-
-    // Method to follow a user
     public void followUser(String follower, String followed) throws IOException {
         if (!isAlreadyFollowing(follower, followed)) {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(followersFilePath, true))) {

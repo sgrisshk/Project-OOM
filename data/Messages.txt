@@ -1,9 +1,0 @@
-# messageID|timestamp|sender|receiver|content|isRead
-# Format: INTEGER|ISO_DATE_TIME|STRING|STRING|STRING|BOOLEAN
-
-1|2023-06-15T14:30:22|alice|bob|Hey Bob, how are you?|true
-2|2023-06-15T14:31:05|bob|alice|I'm good, thanks for asking!|true
-3|2023-06-15T14:31:45|alice|bob|Want to go for coffee later?|false
-4|2023-06-15T15:02:31|charlie|alice|Hi Alice, did you finish the project?|false
-5|2023-06-15T15:10:12|alice|charlie|Not yet, I'm still working on it.|true
-6|2025-03-06T18:30:57.203172|a|Xylo|wsh|false

@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import com.quackstagram.model.Message;
 import com.quackstagram.model.User;
 
-//Service pour gérer les messages entre utilisateurs
+//Service to handle messages between users
 
 public class MessageService {
     private static final String MESSAGES_FILE = "data/Messages.txt";
@@ -29,7 +29,7 @@ public class MessageService {
     }
     
     private MessageService() {
-        // Constructeur privé pour empêcher l'instanciation
+        // Private constructor so nobody can create instances
     }
     
     // Load the next available message ID from the file
@@ -98,20 +98,19 @@ public class MessageService {
     // Récupère la conversation entre deux utilisateurs
 
     public static List<Message> getConversation(User user1, User user2) {
+        // Gets the chat between two users
         return allMessages.stream()
                 .filter(m -> (m.getSender().equals(user1) && m.getReceiver().equals(user2)) || 
                              (m.getSender().equals(user2) && m.getReceiver().equals(user1)))
                 .collect(Collectors.toList());
     }
     
-    //Récupère tous les messages
-
+    // Gets all the messages
     public static List<Message> getAllMessages() {
         return new ArrayList<>(allMessages);
     }
     
-    //Marque un message comme lu
-
+    // Changes message to read=true
     public static void markMessageAsRead(String messageId) {
         for (Message message : allMessages) {
             if (message.getMessageId().equals(messageId)) {
@@ -121,12 +120,12 @@ public class MessageService {
         }
     }
     
-    //Get all conversations for a user
-
+    // Find who you've been talking to
     public static List<String> getUserConversations(User user) {
         List<String> conversationUsers = new ArrayList<>();
         File messagesFile = new File(MESSAGES_FILE);
         
+        // No file = no messages
         if (!messagesFile.exists()) {
             return conversationUsers;
         }
