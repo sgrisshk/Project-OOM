@@ -1,16 +1,15 @@
 package com.quackstagram.util;
 
-/**
- * A simple class to track the currently logged in user
- * This uses the Singleton pattern to ensure there's only one session throughout the app
- */
+// track the currently logged in user
+
 public class UserSession {
     private static UserSession instance;
     private String currentUsername;
     
     // Private constructor to prevent direct instantiation
     private UserSession() {
-        currentUsername = null; // No user logged in by default
+        // Default to "guest" if not logged in
+        currentUsername = "guest";
     }
     
     // Get the single instance of UserSession
@@ -22,7 +21,7 @@ public class UserSession {
     }
     
     // Set the current user
-    public void setCurrentUser(String username) {
+    public void setCurrentUsername(String username) {
         this.currentUsername = username;
     }
     

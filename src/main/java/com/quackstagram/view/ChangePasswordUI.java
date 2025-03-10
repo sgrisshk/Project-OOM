@@ -35,16 +35,13 @@ public class ChangePasswordUI extends BaseUI {
     private void initializeUI() {
         JPanel mainPanel = componentFactory.createPanel(20);
         
-        // Add logo
         mainPanel.add(componentFactory.createLogo("img/logos/QuackstagramLogoTemp.png", 100, 120));
         mainPanel.add(Box.createVerticalStrut(30));
     
-        // Add input fields
         JPanel fieldsPanel = new JPanel();
         fieldsPanel.setLayout(new BoxLayout(fieldsPanel, BoxLayout.Y_AXIS));
         fieldsPanel.setBackground(Color.WHITE);
      
-        // Setup fields
         componentFactory.setupTextField(txtUsername, "Username", FIELD_SIZE);
         componentFactory.setupPasswordField(txtCurrentPassword, "Current Password", FIELD_SIZE);
         componentFactory.setupPasswordField(txtNewPassword, "New Password", FIELD_SIZE);
@@ -61,7 +58,6 @@ public class ChangePasswordUI extends BaseUI {
         mainPanel.add(fieldsPanel);
         mainPanel.add(Box.createVerticalStrut(20));
         
-        // Add buttons
         mainPanel.add(componentFactory.createButtonPanel(
             new ButtonConfig("Update Password", PRIMARY_COLOR, Color.WHITE, this::onUpdatePasswordClicked),
             new ButtonConfig("Cancel", Color.WHITE, SECONDARY_COLOR, this::onCancelClicked)
@@ -77,7 +73,6 @@ public class ChangePasswordUI extends BaseUI {
         String newPassword = new String(txtNewPassword.getPassword());
         String confirmPassword = new String(txtConfirmPassword.getPassword());
         
-        // Validate inputs
         if (username.isEmpty() || currentPassword.isEmpty() || newPassword.isEmpty() || confirmPassword.isEmpty()) {
             DialogUtils.showWarning(this, "Please fill in all fields");
             return;
@@ -88,7 +83,6 @@ public class ChangePasswordUI extends BaseUI {
             return;
         }
         
-        // Verify current password
         try {
             // Authenticate user with current password
             userService.authenticateUser(username, currentPassword);

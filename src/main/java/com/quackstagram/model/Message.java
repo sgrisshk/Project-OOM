@@ -2,9 +2,8 @@ package com.quackstagram.model;
 
 import java.time.LocalDateTime;
 
-/**
- * Représente un message entre deux utilisateurs
- */
+//Représente un message entre deux utilisateurs
+ 
 public class Message {
     private User sender;
     private User receiver;
@@ -22,7 +21,7 @@ public class Message {
     }
     
     private String generateMessageId() {
-        // Simple message ID generation based on timestamp and users
+        //  Infos du message
         return sender.getUsername() + "_" + receiver.getUsername() + "_" + timestamp.toString().replace(":", "-");
     }
     

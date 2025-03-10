@@ -9,22 +9,12 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.LayoutManager;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -39,50 +29,48 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 
+import com.quackstagram.controller.PostController;
+import com.quackstagram.model.Post;
 import com.quackstagram.model.User;
 
 public class QuakstagramHomeUI extends BaseUI {
-    // Dimensions
-    private static final int WIDTH = 360;
-    private static final int HEIGHT = 600;
-    private static final int NAV_ICON_SIZE = 24;
-    private static final int IMAGE_WIDTH = WIDTH - 60;
-    private static final int IMAGE_HEIGHT = 200;
-    
-    // Colors
-    private static final Color LIKE_BUTTON_COLOR = new Color(255, 48, 64);
-    private static final Color UNLIKE_BUTTON_COLOR = new Color(200, 200, 200);
-    private static final Color BACKGROUND_COLOR = new Color(250, 250, 250);
-    private static final Color HEADER_COLOR = new Color(65, 105, 225);
-    private static final Color TEXT_COLOR = new Color(50, 50, 50);
-    private static final Color POST_BACKGROUND = new Color(255, 255, 255);
-    
-    // UI 
     private CardLayout cardLayout;
     private JPanel cardPanel;
     private JPanel homePanel;
     private JPanel imageViewPanel;
-    
-    // Array list to store liked posts
-    private List<String> likedPosts = new ArrayList<>();
-    
+    private PostController postController;
+
+    // Font constants
+    private static final Font TITLE_FONT = new Font("Arial", Font.BOLD, 14);
+    private static final Font BODY_FONT = new Font("Arial", Font.PLAIN, 12);
 
     public QuakstagramHomeUI() {
-        super("Quakstagram Home");
-        setSize(WIDTH, HEIGHT);
-        setMinimumSize(new Dimension(WIDTH, HEIGHT));
+        super("Quackstagram Home");
+        postController = PostController.getInstance();
+        initializeUI();
+    }
+
+    private void initializeUI() {
+        setSize(QuackstagramStyles.WIDTH, QuackstagramStyles.HEIGHT);
+        setMinimumSize(new Dimension(QuackstagramStyles.WIDTH, QuackstagramStyles.HEIGHT));
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
-                cardLayout = new CardLayout();
+        
+        setupPanels();
+        setupHeader();
+        setupNavigation();
+    }
+
+    private void setupPanels() {
+        cardLayout = new CardLayout();
         cardPanel = new JPanel(cardLayout);
-        cardPanel.setBackground(BACKGROUND_COLOR);
+        cardPanel.setBackground(QuackstagramStyles.BACKGROUND_COLOR);
         
         homePanel = new JPanel(new BorderLayout());
-        homePanel.setBackground(BACKGROUND_COLOR);
+        homePanel.setBackground(QuackstagramStyles.BACKGROUND_COLOR);
         
         imageViewPanel = new JPanel(new BorderLayout());
-        imageViewPanel.setBackground(BACKGROUND_COLOR);
-                loadLikedPosts();
+        imageViewPanel.setBackground(QuackstagramStyles.BACKGROUND_COLOR);
 
         setupHomePanel();
         cardPanel.add(homePanel, "Home");
@@ -90,234 +78,101 @@ public class QuakstagramHomeUI extends BaseUI {
 
         add(cardPanel, BorderLayout.CENTER);
         cardLayout.show(cardPanel, "Home");
+    }
+
+    private void setupHeader() {
         JButton messageButton = createIconButton("img/icons/message.png");
+        messageButton.addActionListener(e -> {
+            String username = com.quackstagram.util.UserSession.getInstance().getCurrentUsername();
+            MessageUI.showMessagesFor(new User(username));
+        });
 
         JPanel headerPanel = createHeaderPanel("Quackstagram");
-        headerPanel.setBackground(HEADER_COLOR);
+        headerPanel.setBackground(QuackstagramStyles.HEADER_COLOR);
         headerPanel.setForeground(Color.WHITE);
-        
-        messageButton.addActionListener(e -> {
-            String username = getCurrentUser();
-            User currentUser = new User(username);
-            MessageUI.showMessagesFor(currentUser);
-        });
         
         headerPanel.setLayout(new BorderLayout());
         JLabel titleLabel = new JLabel("Quackstagram 🐥", JLabel.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
         titleLabel.setForeground(Color.WHITE);
         headerPanel.add(titleLabel, BorderLayout.CENTER);
+        
         JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        rightPanel.setBackground(HEADER_COLOR);
+        rightPanel.setBackground(QuackstagramStyles.HEADER_COLOR);
         rightPanel.add(messageButton);
         headerPanel.add(rightPanel, BorderLayout.EAST);
         
         add(headerPanel, BorderLayout.NORTH);
+    }
+
+    private void setupNavigation() {
         add(createNavigationPanel(), BorderLayout.SOUTH);
     }
-    
-  
-    private void loadLikedPosts() {
-        likedPosts.clear();
-        String currentUser = getCurrentUser();
-        
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get("data", "notifications.txt"))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split("; ");
-                if (parts.length >= 3 && parts[1].equals(currentUser)) {
-                    likedPosts.add(parts[2]); 
-                }
-            }
-        } catch (IOException e) {
-        }
-    }
-    
-
-    private String getCurrentUser() {
-        String username = com.quackstagram.util.UserSession.getInstance().getCurrentUsername();
-        
-        if (username == null || username.isEmpty()) {
-            return "";
-        }
-        
-        return username;
-    }
-
 
     private void setupHomePanel() {
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-        contentPanel.setBackground(BACKGROUND_COLOR);
+        contentPanel.setBackground(QuackstagramStyles.BACKGROUND_COLOR);
         contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         
         JScrollPane scrollPane = new JScrollPane(contentPanel);
-        scrollPane.setBackground(BACKGROUND_COLOR);
+        scrollPane.setBackground(QuackstagramStyles.BACKGROUND_COLOR);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         
-        String[][] posts = loadPosts();
-        for (String[] post : posts) {
+        List<Post> posts = postController.getPostsForCurrentUser();
+        for (Post post : posts) {
             createPostItem(contentPanel, post);
         }
         
         homePanel.add(scrollPane, BorderLayout.CENTER);
     }
-  
-    private String[][] loadPosts() {
-        String currentUser = "";
-        String followedUsers = "";
-        
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get("data", "users.txt"))) {
-            String line = reader.readLine();
-            if (line != null) {
-                currentUser = line.split(":")[0].trim();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get("data", "following.txt"))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.startsWith(currentUser + ":")) {
-                    followedUsers = line.split(":")[1].trim();
-                    break;
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        
-        String[][] tempData = new String[100][];
-        int count = 0;
-        
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get("img", "image_details.txt"))) {
-            String line;
-            while ((line = reader.readLine()) != null && count < tempData.length) {
-                String[] details = line.split(", ");
-                String imagePoster = details[1].split(": ")[1];
-                
-                if (followedUsers.contains(imagePoster)) {
-                    String imagePath = "img/uploaded/" + details[0].split(": ")[1] + ".png";
-                    String description = details[2].split(": ")[1];
-                    String likes = "Likes: " + details[4].split(": ")[1];
-                    
-                    tempData[count++] = new String[]{imagePoster, description, likes, imagePath};
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        
-        String[][] posts = new String[count][];
-        System.arraycopy(tempData, 0, posts, 0, count);
-        
-        return posts;
-    }
 
-    private void createPostItem(JPanel panel, String[] postData) {
-        String username = postData[0];
-        String description = postData[1];
-        String likes = postData[2];
-        String imagePath = postData[3];
-        String imageId = new File(imagePath).getName().split("\\.")[0];
-        boolean isLiked = likedPosts.contains(imageId);
-        
+    private void createPostItem(JPanel panel, Post post) {
+        // First create the panel
         JPanel postPanel = new JPanel();
+        // Then set its layout
         postPanel.setLayout(new BoxLayout(postPanel, BoxLayout.Y_AXIS));
-        postPanel.setBackground(POST_BACKGROUND);
+        // Then style it
+        postPanel.setBackground(QuackstagramStyles.POST_BACKGROUND);
         postPanel.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(new Color(220, 220, 220), 1),
             BorderFactory.createEmptyBorder(10, 10, 10, 10)
         ));
         postPanel.setAlignmentX(CENTER_ALIGNMENT);
         
-        JLabel usernameLabel = new JLabel(username);
-        usernameLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        usernameLabel.setForeground(TEXT_COLOR);
-        JPanel usernamePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        usernamePanel.setBackground(POST_BACKGROUND);
-        usernamePanel.add(usernameLabel);
-        postPanel.add(usernamePanel);
+        // Username
+        JLabel usernameLabel = createStyledLabel(post.getUsername(), TITLE_FONT, 
+            QuackstagramStyles.TEXT_COLOR, Component.LEFT_ALIGNMENT);
+        postPanel.add(wrapInFlowPanel(usernameLabel, QuackstagramStyles.POST_BACKGROUND, FlowLayout.LEFT));
         postPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         
-        // Add image
-        JLabel imageLabel = new JLabel();
-        imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        imageLabel.setPreferredSize(new Dimension(IMAGE_WIDTH, IMAGE_HEIGHT));
-        imageLabel.setBorder(BorderFactory.createLineBorder(new Color(230, 230, 230)));
+        // Image
+        JLabel imageLabel = createImageLabel(post);
+        postPanel.add(wrapInFlowPanel(imageLabel, QuackstagramStyles.POST_BACKGROUND, FlowLayout.CENTER));
+        postPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         
-        try {
-            BufferedImage originalImage = ImageIO.read(new File(imagePath));
-            BufferedImage croppedImage = originalImage.getSubimage(0, 0, 
-                Math.min(originalImage.getWidth(), IMAGE_WIDTH), 
-                Math.min(originalImage.getHeight(), IMAGE_HEIGHT));
-            ImageIcon imageIcon = new ImageIcon(croppedImage);
-            imageLabel.setIcon(imageIcon);
-        } catch (IOException ex) {
-            imageLabel.setText("Image not found");
-            imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        // Description
+        if (!post.getDescription().isEmpty()) {
+            JLabel descriptionLabel = createStyledLabel(post.getDescription(), BODY_FONT,
+                QuackstagramStyles.TEXT_COLOR, Component.LEFT_ALIGNMENT);
+            postPanel.add(wrapInFlowPanel(descriptionLabel, QuackstagramStyles.POST_BACKGROUND, FlowLayout.LEFT));
         }
         
-        JPanel imageContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        imageContainer.setBackground(POST_BACKGROUND);
-        imageContainer.add(imageLabel);
-        postPanel.add(imageContainer);
+        // Likes
+        JLabel likesLabel = createStyledLabel("Likes: " + post.getLikes(), BODY_FONT,
+            QuackstagramStyles.TEXT_COLOR, Component.LEFT_ALIGNMENT);
+        postPanel.add(wrapInFlowPanel(likesLabel, QuackstagramStyles.POST_BACKGROUND, FlowLayout.LEFT));
         
-        // Add spacing
-        postPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        
-        // Add description
-        JLabel descriptionLabel = new JLabel(description);
-        descriptionLabel.setFont(new Font("Arial", Font.PLAIN, 12));
-        descriptionLabel.setForeground(TEXT_COLOR);
-        JPanel descriptionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        descriptionPanel.setBackground(POST_BACKGROUND);
-        descriptionPanel.add(descriptionLabel);
-        postPanel.add(descriptionPanel);
-        
-        // Add likes
-        JLabel likesLabel = new JLabel(likes);
-        likesLabel.setFont(new Font("Arial", Font.PLAIN, 12));
-        likesLabel.setForeground(TEXT_COLOR);
-        JPanel likesPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        likesPanel.setBackground(POST_BACKGROUND);
-        likesPanel.add(likesLabel);
-        postPanel.add(likesPanel);
-        
-        // Add like button - use filled heart if already liked, otherwise use empty heart
-        JButton likeButton = new JButton("♥️");
-        likeButton.setFont(new Font("Arial", Font.BOLD, 16));
-        likeButton.setForeground(Color.WHITE);
-        
-        // Set initial state based on if post is already liked
-        updateLikeButtonState(likeButton, isLiked);
-        
-        likeButton.setOpaque(true);
-        likeButton.setBorderPainted(false);
-        likeButton.setFocusPainted(false);
-        likeButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        likeButton.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-        
-        likeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                boolean wasLiked = likedPosts.contains(imageId);
-                handleLikeToggle(imageId, likesLabel, likeButton, wasLiked);
-            }
-        });
-
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        buttonPanel.setBackground(POST_BACKGROUND);
-        buttonPanel.add(likeButton);
-        postPanel.add(buttonPanel);
+        // Like button
+        JButton likeButton = createLikeButton(post, likesLabel);
+        postPanel.add(wrapInFlowPanel(likeButton, QuackstagramStyles.POST_BACKGROUND, FlowLayout.LEFT));
         
         // Make image clickable
         imageLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                displayImage(postData, isLiked);
+                displayImage(post);
             }
             
             @Override
@@ -326,141 +181,87 @@ public class QuakstagramHomeUI extends BaseUI {
             }
         });
         
-        // Add post to content panel
         panel.add(postPanel);
         panel.add(Box.createRigidArea(new Dimension(0, 15)));
     }
 
+    private JLabel createImageLabel(Post post) {
+        JLabel imageLabel = new JLabel();
+        imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        imageLabel.setPreferredSize(new Dimension(QuackstagramStyles.IMAGE_WIDTH, QuackstagramStyles.IMAGE_HEIGHT));
+        imageLabel.setBorder(BorderFactory.createLineBorder(new Color(230, 230, 230)));
+        
+        try {
+            BufferedImage originalImage = ImageIO.read(new File(post.getImagePath()));
+            BufferedImage croppedImage = originalImage.getSubimage(0, 0, 
+                Math.min(originalImage.getWidth(), QuackstagramStyles.IMAGE_WIDTH), 
+                Math.min(originalImage.getHeight(), QuackstagramStyles.IMAGE_HEIGHT));
+            ImageIcon imageIcon = new ImageIcon(croppedImage);
+            imageLabel.setIcon(imageIcon);
+        } catch (IOException ex) {
+            imageLabel.setText("Image not found");
+            imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        }
+        
+        return imageLabel;
+    }
+
+    private JButton createLikeButton(Post post, JLabel likesLabel) {
+        JButton likeButton = new JButton("♥️");
+        likeButton.setFont(new Font("Arial", Font.BOLD, 16));
+        likeButton.setForeground(Color.WHITE);
+        updateLikeButtonState(likeButton, post.isLiked());
+        
+        likeButton.setOpaque(true);
+        likeButton.setBorderPainted(false);
+        likeButton.setFocusPainted(false);
+        likeButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        likeButton.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        
+        likeButton.addActionListener(e -> {
+            postController.toggleLike(post);
+            updateLikeButtonState(likeButton, post.isLiked());
+            likesLabel.setText("Likes: " + post.getLikes());
+        });
+        
+        return likeButton;
+    }
+
     private void updateLikeButtonState(JButton likeButton, boolean isLiked) {
-        if (isLiked) {
-            likeButton.setBackground(LIKE_BUTTON_COLOR);
-        } else {
-            likeButton.setBackground(UNLIKE_BUTTON_COLOR);
-        }
-    }
-    
-
-    private void handleLikeToggle(String imageId, JLabel likesLabel, JButton likeButton, boolean wasLiked) {
-        Path detailsPath = Paths.get("img", "image_details.txt");
-        StringBuilder newContent = new StringBuilder();
-        boolean updated = false;
-        String currentUser = getCurrentUser();
-        String imageOwner = "";
-        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-
-        // Update likes in image_details.txt
-        try (BufferedReader reader = Files.newBufferedReader(detailsPath)) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.contains("ImageID: " + imageId)) {
-                    String[] parts = line.split(", ");
-                    imageOwner = parts[1].split(": ")[1];
-                    int likes = Integer.parseInt(parts[4].split(": ")[1]);
-                    
-                    if (wasLiked) {
-                        // Unlike the post
-                        likes--; // Decrement likes
-                        likedPosts.remove(imageId);
-                        updateLikeButtonState(likeButton, false);
-                    } else {
-                        // Like the post
-                        likes++; // Increment likes
-                        likedPosts.add(imageId);
-                        updateLikeButtonState(likeButton, true);
-                    }
-                    
-                    parts[4] = "Likes: " + likes;
-                    line = String.join(", ", parts);
-
-                    // Update UI
-                    likesLabel.setText("Likes: " + likes);
-                    updated = true;
-                }
-                newContent.append(line).append("\n");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        // Write updated content back to file
-        if (updated) {
-            try (BufferedWriter writer = Files.newBufferedWriter(detailsPath)) {
-                writer.write(newContent.toString());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            
-            // Update notifications file
-            if (!wasLiked) {
-                // Add notification for a new like
-                String notification = String.format("%s; %s; %s; %s\n", imageOwner, currentUser, imageId, timestamp);
-                try (BufferedWriter notificationWriter = Files.newBufferedWriter(
-                        Paths.get("data", "notifications.txt"), 
-                        StandardOpenOption.CREATE, 
-                        StandardOpenOption.APPEND)) {
-                    notificationWriter.write(notification);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                // Remove notification for unlike
-                try {
-                    Path notificationsPath = Paths.get("data", "notifications.txt");
-                    List<String> notificationLines = Files.readAllLines(notificationsPath);
-                    List<String> updatedLines = new ArrayList<>();
-                    
-                    for (String line : notificationLines) {
-                        String[] parts = line.split("; ");
-                        if (parts.length >= 3 && parts[1].equals(currentUser) && parts[2].equals(imageId)) {
-                        } else {
-                            updatedLines.add(line);
-                        }
-                    }
-                    
-                    Files.write(notificationsPath, updatedLines);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+        likeButton.setBackground(isLiked ? 
+            QuackstagramStyles.LIKE_BUTTON_COLOR : 
+            QuackstagramStyles.UNLIKE_BUTTON_COLOR);
     }
 
-  
-    private void displayImage(String[] postData, boolean isLiked) {
+    private void displayImage(Post post) {
         imageViewPanel.removeAll();
         
-        String username = postData[0];
-        String description = postData[1];
-        String likes = postData[2];
-        String imagePath = postData[3];
-        String imageId = new File(imagePath).getName().split("\\.")[0];
-        
-        // Add back button
+        // Back button
         JButton backButton = new JButton("← Back");
         backButton.setFont(new Font("Arial", Font.BOLD, 14));
-        backButton.setForeground(HEADER_COLOR);
-        backButton.setBackground(BACKGROUND_COLOR);
+        backButton.setForeground(QuackstagramStyles.HEADER_COLOR);
+        backButton.setBackground(QuackstagramStyles.BACKGROUND_COLOR);
         backButton.setBorderPainted(false);
         backButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         backButton.addActionListener(e -> cardLayout.show(cardPanel, "Home"));
         
         JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(BACKGROUND_COLOR);
+        topPanel.setBackground(QuackstagramStyles.BACKGROUND_COLOR);
         topPanel.add(backButton, BorderLayout.WEST);
         topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         imageViewPanel.add(topPanel, BorderLayout.NORTH);
         
-        // Add image
+        // Full image
         JLabel fullImageLabel = new JLabel();
         fullImageLabel.setHorizontalAlignment(JLabel.CENTER);
         
         try {
-            BufferedImage originalImage = ImageIO.read(new File(imagePath));
-            int displayWidth = WIDTH - 40;
-            int displayHeight = HEIGHT - 200;
+            BufferedImage originalImage = ImageIO.read(new File(post.getImagePath()));
+            int displayWidth = QuackstagramStyles.WIDTH - 40;
+            int displayHeight = QuackstagramStyles.HEIGHT - 200;
             double aspectRatio = (double) originalImage.getWidth() / originalImage.getHeight();
-            int scaledWidth, scaledHeight;
             
+            int scaledWidth, scaledHeight;
             if (displayWidth / aspectRatio <= displayHeight) {
                 scaledWidth = displayWidth;
                 scaledHeight = (int) (displayWidth / aspectRatio);
@@ -470,136 +271,115 @@ public class QuakstagramHomeUI extends BaseUI {
             }
             
             Image scaledImage = originalImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
-            ImageIcon imageIcon = new ImageIcon(scaledImage);
-            fullImageLabel.setIcon(imageIcon);
+            fullImageLabel.setIcon(new ImageIcon(scaledImage));
         } catch (IOException ex) {
             fullImageLabel.setText("Image not found");
             fullImageLabel.setHorizontalAlignment(SwingConstants.CENTER);
         }
         
         JPanel imageContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        imageContainer.setBackground(BACKGROUND_COLOR);
+        imageContainer.setBackground(QuackstagramStyles.BACKGROUND_COLOR);
         imageContainer.add(fullImageLabel);
         imageViewPanel.add(imageContainer, BorderLayout.CENTER);
         
-        // Add user info and like panel
+        // Info panel
         JPanel infoPanel = new JPanel();
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
-        infoPanel.setBackground(BACKGROUND_COLOR);
+        infoPanel.setBackground(QuackstagramStyles.BACKGROUND_COLOR);
         infoPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         
-        // Add username
-        JLabel usernameLabel = new JLabel(username);
-        usernameLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        usernameLabel.setForeground(TEXT_COLOR);
-        usernameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        infoPanel.add(usernameLabel);
-        infoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        
-        // Add description
-        JLabel descriptionLabel = new JLabel(description);
-        descriptionLabel.setFont(new Font("Arial", Font.PLAIN, 12));
-        descriptionLabel.setForeground(TEXT_COLOR);
-        descriptionLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        infoPanel.add(descriptionLabel);
-        infoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        
-        // Add likes
-        JLabel likesLabel = new JLabel(likes);
-        likesLabel.setFont(new Font("Arial", Font.PLAIN, 12));
-        likesLabel.setForeground(TEXT_COLOR);
-        likesLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        infoPanel.add(likesLabel);
-        infoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        
-        // Add like button
-        JButton likeButton = new JButton("♥️");
-        likeButton.setFont(new Font("Arial", Font.BOLD, 16));
-        likeButton.setForeground(Color.WHITE);
-        updateLikeButtonState(likeButton, isLiked);
-        likeButton.setOpaque(true);
-        likeButton.setBorderPainted(false);
-        likeButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        
-        likeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                boolean wasLiked = likedPosts.contains(imageId);
-                handleLikeToggle(imageId, likesLabel, likeButton, wasLiked);
-                
-                // Update postData with new like count for when we refresh
-                try (BufferedReader reader = Files.newBufferedReader(Paths.get("img", "image_details.txt"))) {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        if (line.contains("ImageID: " + imageId)) {
-                            String likes = line.split(", ")[4].split(": ")[1];
-                            postData[2] = "Likes: " + likes;
-                            break;
-                        }
-                    }
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        });
-        
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        buttonPanel.setBackground(BACKGROUND_COLOR);
-        buttonPanel.add(likeButton);
-        buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        infoPanel.add(buttonPanel);
+        // Add details
+        addInfoPanelDetails(infoPanel, post);
         
         imageViewPanel.add(infoPanel, BorderLayout.SOUTH);
-            
         imageViewPanel.revalidate();
         imageViewPanel.repaint();
         cardLayout.show(cardPanel, "ImageView");
     }
-    
-    
+
+    private void addInfoPanelDetails(JPanel infoPanel, Post post) {
+        // Username
+        infoPanel.add(createStyledLabel(post.getUsername(), TITLE_FONT,
+            QuackstagramStyles.TEXT_COLOR, Component.LEFT_ALIGNMENT));
+        infoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        
+        // Description
+        if (!post.getDescription().isEmpty()) {
+            infoPanel.add(createStyledLabel(post.getDescription(), BODY_FONT,
+                QuackstagramStyles.TEXT_COLOR, Component.LEFT_ALIGNMENT));
+            infoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        }
+        
+        // Likes
+        JLabel likesLabel = createStyledLabel("Likes: " + post.getLikes(), BODY_FONT,
+            QuackstagramStyles.TEXT_COLOR, Component.LEFT_ALIGNMENT);
+        infoPanel.add(likesLabel);
+        infoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        
+        // Like button
+        JButton likeButton = createLikeButton(post, likesLabel);
+        JPanel buttonPanel = wrapInFlowPanel(likeButton, QuackstagramStyles.BACKGROUND_COLOR, FlowLayout.LEFT);
+        buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        infoPanel.add(buttonPanel);
+    }
+
+    private JLabel createStyledLabel(String text, Font font, Color color, float alignment) {
+        JLabel label = new JLabel(text);
+        label.setFont(font);
+        label.setForeground(color);
+        label.setAlignmentX(alignment);
+        return label;
+    }
+
+    private JPanel createStyledPanel(LayoutManager layout, Color background) {
+        JPanel panel = new JPanel(layout);
+        panel.setBackground(background);
+        return panel;
+    }
+
+    private JPanel wrapInFlowPanel(Component component, Color background, int alignment) {
+        JPanel panel = createStyledPanel(new FlowLayout(alignment), background);
+        panel.add(component);
+        return panel;
+    }
+
+    private BufferedImage scaleImage(BufferedImage original, int targetWidth, int targetHeight) {
+        double aspectRatio = (double) original.getWidth() / original.getHeight();
+        int scaledWidth, scaledHeight;
+        
+        if (targetWidth / aspectRatio <= targetHeight) {
+            scaledWidth = targetWidth;
+            scaledHeight = (int) (targetWidth / aspectRatio);
+        } else {
+            scaledHeight = targetHeight;
+            scaledWidth = (int) (targetHeight * aspectRatio);
+        }
+        
+        Image scaled = original.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
+        BufferedImage result = new BufferedImage(scaledWidth, scaledHeight, BufferedImage.TYPE_INT_ARGB);
+        result.getGraphics().drawImage(scaled, 0, 0, null);
+        return result;
+    }
+
     protected JButton createIconButton(String iconPath) {
         ImageIcon iconOriginal = new ImageIcon(iconPath);
-        Image iconScaled = iconOriginal.getImage().getScaledInstance(NAV_ICON_SIZE, NAV_ICON_SIZE, Image.SCALE_SMOOTH);
+        Image iconScaled = iconOriginal.getImage().getScaledInstance(QuackstagramStyles.NAV_ICON_SIZE, QuackstagramStyles.NAV_ICON_SIZE, Image.SCALE_SMOOTH);
         JButton button = new JButton(new ImageIcon(iconScaled));
         button.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
         button.setContentAreaFilled(false);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return button;
     }
-    
 
     protected JButton createIconButton(String iconPath, String buttonType) {
         JButton button = createIconButton(iconPath);
         button.addActionListener(e -> navigateToScreen(buttonType));
         return button;
     }
-    
-    
+
     @Override
     protected void navigateToScreen(String screenType) {
         this.dispose();
-        
-        switch (screenType) {
-            case "home":
-                new QuakstagramHomeUI().setVisible(true);
-                break;
-            case "explore":
-                new ExploreUI().setVisible(true);
-                break;
-            case "upload":
-                new ImageUploadUI().setVisible(true);
-                break;
-            case "notifications":
-                new NotificationsUI().setVisible(true);
-                break;
-            case "profile":
-                String username = getCurrentUser();
-                User user = new User(username);
-                new InstagramProfileUI(user).setVisible(true);
-                break;
-            default:
-                new QuakstagramHomeUI().setVisible(true);
-                break;
-        }
+        com.quackstagram.util.NavigationUtils.navigateTo(screenType);
     }
 }

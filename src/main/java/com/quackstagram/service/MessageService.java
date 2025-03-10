@@ -14,9 +14,8 @@ import java.util.stream.Collectors;
 import com.quackstagram.model.Message;
 import com.quackstagram.model.User;
 
-/**
- * Service pour gérer les messages entre utilisateurs
- */
+//Service pour gérer les messages entre utilisateurs
+
 public class MessageService {
     private static final String MESSAGES_FILE = "data/Messages.txt";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
@@ -33,9 +32,8 @@ public class MessageService {
         // Constructeur privé pour empêcher l'instanciation
     }
     
-    /**
-     * Load the next available message ID from the file
-     */
+    // Load the next available message ID from the file
+
     private static void loadNextMessageId() {
         File messagesFile = new File(MESSAGES_FILE);
         if (!messagesFile.exists()) {
@@ -69,9 +67,8 @@ public class MessageService {
         }
     }
     
-    /**
-     * Create the messages file with a header row
-     */
+    // Create the messages file with a header row
+     
     private static void createMessagesFile() {
         File dataDir = new File("data");
         if (!dataDir.exists()) {
@@ -87,9 +84,7 @@ public class MessageService {
         }
     }
     
-    /**
-     * Enregistre un nouveau message
-     */
+    // Enregistre un nouveau message
     public static Message saveMessage(User sender, User receiver, String content) {
         if (content == null || content.trim().isEmpty()) {
             return null;
@@ -100,9 +95,8 @@ public class MessageService {
         return message;
     }
     
-    /**
-     * Récupère la conversation entre deux utilisateurs
-     */
+    // Récupère la conversation entre deux utilisateurs
+
     public static List<Message> getConversation(User user1, User user2) {
         return allMessages.stream()
                 .filter(m -> (m.getSender().equals(user1) && m.getReceiver().equals(user2)) || 
@@ -110,16 +104,14 @@ public class MessageService {
                 .collect(Collectors.toList());
     }
     
-    /**
-     * Récupère tous les messages
-     */
+    //Récupère tous les messages
+
     public static List<Message> getAllMessages() {
         return new ArrayList<>(allMessages);
     }
     
-    /**
-     * Marque un message comme lu
-     */
+    //Marque un message comme lu
+
     public static void markMessageAsRead(String messageId) {
         for (Message message : allMessages) {
             if (message.getMessageId().equals(messageId)) {
@@ -129,9 +121,8 @@ public class MessageService {
         }
     }
     
-    /**
-     * Get all conversations for a user
-     */
+    //Get all conversations for a user
+
     public static List<String> getUserConversations(User user) {
         List<String> conversationUsers = new ArrayList<>();
         File messagesFile = new File(MESSAGES_FILE);

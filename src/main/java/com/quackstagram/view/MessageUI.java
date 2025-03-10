@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -17,17 +18,20 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 
 import com.quackstagram.model.Message;
 import com.quackstagram.model.User;
+import com.quackstagram.network.MessageClient;
 import com.quackstagram.service.MessageService;
 
-/**
- * A simple UI for the messaging system in Quackstagram
- */
+
+ // A simple UI for the messaging system in Quackstagram
+ 
 public class MessageUI extends JFrame {
     private User currentUser;
     private User selectedReceiver;
+    private MessageClient messageClient;
     
     private JList<String> contactsList;
     private DefaultListModel<String> contactsModel;
@@ -39,14 +43,11 @@ public class MessageUI extends JFrame {
     
     public MessageUI(User currentUser) {
         this.currentUser = currentUser;
-        
-        // Set up the frame
+        initializeNetworking();
         setTitle("Quackstagram Messages - " + currentUser.getUsername());
         setSize(600, 400);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
-        
-        // Contacts Panel
         JPanel contactsPanel = new JPanel(new BorderLayout());
         contactsPanel.setBorder(BorderFactory.createTitledBorder("Contacts"));
         contactsModel = new DefaultListModel<>();
@@ -54,16 +55,12 @@ public class MessageUI extends JFrame {
         contactsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane contactsScroll = new JScrollPane(contactsList);
         contactsPanel.add(contactsScroll, BorderLayout.CENTER);
-        
-        // Conv Panel
         JPanel conversationPanel = new JPanel(new BorderLayout());
         conversationPanel.setBorder(BorderFactory.createTitledBorder("Conversation"));
         conversationArea = new JTextArea();
         conversationArea.setEditable(false);
         JScrollPane conversationScroll = new JScrollPane(conversationArea);
         conversationPanel.add(conversationScroll, BorderLayout.CENTER);
-        
-        // Message Input Panel
         JPanel inputPanel = new JPanel(new BorderLayout());
         messageField = new JTextField();
         sendButton = new JButton("Send");
@@ -72,9 +69,7 @@ public class MessageUI extends JFrame {
         conversationPanel.add(inputPanel, BorderLayout.SOUTH);
         add(contactsPanel, BorderLayout.WEST);
         add(conversationPanel, BorderLayout.CENTER);
-        
-        // Add event listeners
-        contactsList.addListSelectionListener(e -> {
+            contactsList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && contactsList.getSelectedIndex() != -1) {
                 String username = contactsList.getSelectedValue();
                 selectedReceiver = new User(username);
@@ -83,18 +78,47 @@ public class MessageUI extends JFrame {
         });
         
         sendButton.addActionListener(e -> {
-            if (selectedReceiver != null && !messageField.getText().trim().isEmpty()) {
-                currentUser.sendMessage(selectedReceiver, messageField.getText().trim());
-                messageField.setText("");
-                refreshConversation();
-            }
+            sendMessage();
         });
         
-        // Initialize contacts from following relationships
         addContacts();
-        
-        // Also add contacts from message history if any
         addContactsFromMessages();
+    }
+    
+    private void initializeNetworking() {
+        messageClient = new MessageClient(currentUser);
+        messageClient.addListener((sender, content) -> {
+            // Update conversation if message is from current chat
+            if (selectedReceiver != null && sender.equals(selectedReceiver.getUsername())) {
+                SwingUtilities.invokeLater(() -> {
+                    conversationArea.append(String.format("[%s] %s: %s\n", 
+                        LocalDateTime.now().format(TIME_FORMATTER),
+                        sender, content));
+                    conversationArea.setCaretPosition(conversationArea.getDocument().getLength());
+                });
+            }
+        });
+        messageClient.connect();
+    }
+
+    @Override
+    public void dispose() {
+        if (messageClient != null) {
+            messageClient.disconnect();
+        }
+        super.dispose();
+    }
+
+    private void sendMessage() {
+        if (selectedReceiver != null && !messageField.getText().trim().isEmpty()) {
+            String content = messageField.getText().trim();
+            // Send via network
+            messageClient.sendMessage(selectedReceiver.getUsername(), content);
+            // Store in local database
+            currentUser.sendMessage(selectedReceiver, content);
+            messageField.setText("");
+            refreshConversation();
+        }
     }
     
     private void addContacts() {
@@ -119,9 +143,8 @@ public class MessageUI extends JFrame {
         }
     }
     
-    /**
-     * Add contacts from message history
-     */
+     //Add contacts from message history
+
     private void addContactsFromMessages() {
         List<String> conversationUsers = MessageService.getUserConversations(currentUser);
         for (String username : conversationUsers) {
@@ -131,9 +154,8 @@ public class MessageUI extends JFrame {
         }
     }
     
-    /**
-     * Check if a username is already in the contacts list
-     */
+    //Check if a username is already in the contacts list
+     
     private boolean isInContactsList(String username) {
         for (int i = 0; i < contactsModel.getSize(); i++) {
             if (contactsModel.getElementAt(i).equals(username)) {
@@ -143,9 +165,8 @@ public class MessageUI extends JFrame {
         return false;
     }
     
-    /**
-     * Refresh the conversation display with the selected user
-     */
+    //Refresh the conversation display with the selected user
+  
     private void refreshConversation() {
         if (selectedReceiver == null) return;
         
@@ -166,9 +187,8 @@ public class MessageUI extends JFrame {
         conversationArea.setCaretPosition(conversationArea.getDocument().getLength());
     }
     
-    /**
-     * Format a message for display
-     */
+    //Format a message for display
+  
     private String formatMessage(Message message) {
         String sender = message.getSender().getUsername();
         String time = message.getTimestamp().format(TIME_FORMATTER);
@@ -183,10 +203,7 @@ public class MessageUI extends JFrame {
         }
     }
     
-    /**
-     * Update the contacts list with actual users
-     * @param users List of users to display as contacts
-     */
+
     public void setContacts(List<User> users) {
         contactsModel.clear();
         for (User user : users) {
@@ -196,9 +213,8 @@ public class MessageUI extends JFrame {
         }
     }
     
-    /**
-     * Static method to show the messaging UI for a user
-     */
+    // Static method to show the messaging UI for a user
+     
     public static void showMessagesFor(User user) {
         MessageUI ui = new MessageUI(user);
         ui.setVisible(true);

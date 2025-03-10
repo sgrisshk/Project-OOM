@@ -20,6 +20,7 @@ public class SignInUI extends AuthUI {
         this.userService = new UserService();
         
         // Use AuthUI's initializeUI method with all three buttons
+        //primary, secondary and tertiar = buttons in the auth classes 
         initializeUI(
             false,  // no bio
             false,  // no photo upload
@@ -49,7 +50,7 @@ public class SignInUI extends AuthUI {
         try {
             User user = userService.authenticateUser(username, password);
             // Set the current user in the UserSession
-            UserSession.getInstance().setCurrentUser(username);
+            UserSession.getInstance().setCurrentUsername(username);
             System.out.println("User logged in: " + username); // Debug message
             NavigationUtils.navigateTo(this, () -> new InstagramProfileUI(user));
         } catch (IllegalArgumentException ex) {
@@ -71,3 +72,4 @@ public class SignInUI extends AuthUI {
 }
 
 
+    

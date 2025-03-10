@@ -3,9 +3,8 @@ package com.quackstagram.service;
 import java.io.IOException;
 import com.quackstagram.model.User;
 
-/**
- * Interface pour le service utilisateur
- */
+//Interface for User Service
+
 public interface UserServiceInterface {
     User registerUser(String username, String password, String bio);
     User authenticateUser(String username, String password);
@@ -14,5 +13,6 @@ public interface UserServiceInterface {
     void changePassword(String username, String newPassword);
     void saveUser(User user);
     String getPassword(String username) throws IOException;
+    
 }
 

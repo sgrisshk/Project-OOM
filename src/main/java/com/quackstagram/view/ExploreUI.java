@@ -1,28 +1,38 @@
 package com.quackstagram.view;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.*;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.stream.Stream;
-import javax.imageio.ImageIO;
-import javax.swing.*;
 
+import javax.imageio.ImageIO;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+
+import com.quackstagram.controller.PostController;
+import com.quackstagram.model.Post;
 import com.quackstagram.model.User;
 
 public class ExploreUI extends BaseUI {
     private static final int IMAGE_SIZE = WIDTH / 3;
+    private final PostController postController;
 
     public ExploreUI() {
         super("Explore");
+        this.postController = PostController.getInstance();
+        
         getContentPane().removeAll();
         setLayout(new BorderLayout());
 
@@ -41,7 +51,6 @@ public class ExploreUI extends BaseUI {
         searchPanel.add(searchField, BorderLayout.CENTER);
         searchPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, searchField.getPreferredSize().height));
 
-
         JPanel imageGridPanel = new JPanel(new GridLayout(0, 3, 2, 2));
 
         File imageDir = new File("img/uploaded");
@@ -56,7 +65,8 @@ public class ExploreUI extends BaseUI {
                     imageLabel.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
-                            displayImage(imageFile.getPath());
+                            String imageId = imageFile.getName().split("\\.")[0];
+                            displayImage(imageId);
                         }
                     });
                     imageGridPanel.add(imageLabel);
@@ -75,44 +85,28 @@ public class ExploreUI extends BaseUI {
         return mainContentPanel;
     }
 
-    private void displayImage(String imagePath) {
+    private void displayImage(String imageId) {
         getContentPane().removeAll();
         setLayout(new BorderLayout());
 
         add(createHeaderPanel("Explore Page"), BorderLayout.NORTH);
         add(createNavigationPanel(), BorderLayout.SOUTH);
 
-        JPanel imageViewerPanel = new JPanel(new BorderLayout());
-
-        String imageId = new File(imagePath).getName().split("\\.")[0];
-
-        // Read image details
-        String username = "";
-        String bio = "";
-        String timestampString = "";
-        int likes = 0;
-        Path detailsPath = Paths.get("img", "image_details.txt");
-        try (Stream<String> lines = Files.lines(detailsPath)) {
-            String details = lines.filter(line -> line.contains("ImageID: " + imageId)).findFirst().orElse("");
-            if (!details.isEmpty()) {
-                String[] parts = details.split(", ");
-                username = parts[1].split(": ")[1];
-                bio = parts[2].split(": ")[1];
-                System.out.println(bio+"this is where you get an error "+parts[3]);
-                timestampString = parts[3].split(": ")[1];
-                likes = Integer.parseInt(parts[4].split(": ")[1]);
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        // Get post details using PostController instead of direct file reading
+        Post post = postController.getPostById(imageId);
+        if (post == null) {
+            JLabel errorLabel = new JLabel("Image not found");
+            add(errorLabel, BorderLayout.CENTER);
+            revalidate();
+            repaint();
+            return;
         }
 
-        String timeSincePosting = "Unknown";
-        if (!timestampString.isEmpty()) {
-            LocalDateTime timestamp = LocalDateTime.parse(timestampString, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-            LocalDateTime now = LocalDateTime.now();
-            long days = ChronoUnit.DAYS.between(timestamp, now);
-            timeSincePosting = days + " day" + (days != 1 ? "s" : "") + " ago";
-        }
+        String username = post.getUsername();
+        String bio = post.getDescription();
+        String timeSincePosting = postController.getTimeSincePosting(post);
+        int likes = post.getLikes();
+        String imagePath = post.getImagePath();
 
         // Top panel for username and time since posting
         JPanel topPanel = new JPanel(new BorderLayout());
@@ -122,37 +116,35 @@ public class ExploreUI extends BaseUI {
         topPanel.add(usernameLabel, BorderLayout.WEST);
         topPanel.add(timeLabel, BorderLayout.EAST);
 
-
         // Prepare the image for display
-        JLabel imageLabel = new JLabel();
-        imageLabel.setHorizontalAlignment(JLabel.CENTER);
-        try {
-            BufferedImage originalImage = ImageIO.read(new File(imagePath));
-            ImageIcon imageIcon = new ImageIcon(originalImage);
-            imageLabel.setIcon(imageIcon);
-        } catch (IOException ex) {
-            imageLabel.setText("Image not found");
-        }
+        JLabel imageLabel = createImageLabel(imagePath);
 
         // Bottom panel for bio and likes
         JPanel bottomPanel = new JPanel(new BorderLayout());
         JTextArea bioTextArea = new JTextArea(bio);
         bioTextArea.setEditable(false);
+        
+        // Create like button and panel
+        JPanel likesPanel = new JPanel(new BorderLayout());
+        JButton likeButton = new JButton(post.isLiked() ? "Unlike" : "Like");
         JLabel likesLabel = new JLabel("Likes: " + likes);
+        
+        likeButton.addActionListener(e -> {
+            postController.toggleLike(post);
+            likeButton.setText(post.isLiked() ? "Unlike" : "Like");
+            likesLabel.setText("Likes: " + post.getLikes());
+        });
+        
+        likesPanel.add(likeButton, BorderLayout.WEST);
+        likesPanel.add(likesLabel, BorderLayout.EAST);
+        
         bottomPanel.add(bioTextArea, BorderLayout.CENTER);
-        bottomPanel.add(likesLabel, BorderLayout.SOUTH);
-
-        add(topPanel, BorderLayout.NORTH);
-        add(imageLabel, BorderLayout.CENTER);
-        add(bottomPanel, BorderLayout.SOUTH);
-
+        bottomPanel.add(likesPanel, BorderLayout.SOUTH);
 
         // Panel for the back button
         JPanel backButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton backButton = new JButton("Back");
-
         backButton.setPreferredSize(new Dimension(WIDTH-20, backButton.getPreferredSize().height));
-
         backButtonPanel.add(backButton);
 
         backButton.addActionListener(e -> {
@@ -162,18 +154,15 @@ public class ExploreUI extends BaseUI {
             revalidate();
             repaint();
         });
-        final String finalUsername = username;
 
         usernameLabel.addActionListener(e -> {
-            User user = new User(finalUsername);
+            User user = new User(username);
             InstagramProfileUI profileUI = new InstagramProfileUI(user);
             profileUI.setVisible(true);
             dispose();
         });
 
-
         JPanel containerPanel = new JPanel(new BorderLayout());
-
         containerPanel.add(topPanel, BorderLayout.NORTH);
         containerPanel.add(imageLabel, BorderLayout.CENTER);
         containerPanel.add(bottomPanel, BorderLayout.SOUTH);
@@ -183,42 +172,6 @@ public class ExploreUI extends BaseUI {
 
         revalidate();
         repaint();
-    }
-
-    private static class ImageDetails {
-        String username = "";
-        String bio = "";
-        String timestamp = "";
-        int likes = 0;
-    }
-
-    private ImageDetails readImageDetails(String imageId) {
-        ImageDetails details = new ImageDetails();
-        Path detailsPath = Paths.get("img", "image_details.txt");
-        try (Stream<String> lines = Files.lines(detailsPath)) {
-            String detailsLine = lines.filter(line -> line.contains("ImageID: " + imageId))
-                    .findFirst()
-                    .orElse("");
-            if (!detailsLine.isEmpty()) {
-                String[] parts = detailsLine.split(", ");
-                details.username = parts[1].split(": ")[1];
-                details.bio = parts[2].split(": ")[1];
-                details.timestamp = parts[3].split(": ")[1];
-                details.likes = Integer.parseInt(parts[4].split(": ")[1]);
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return details;
-    }
-
-    private String calculateTimeSincePosting(String timestampString) {
-        if (timestampString.isEmpty()) return "Unknown";
-
-        LocalDateTime timestamp = LocalDateTime.parse(timestampString,
-                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        long days = ChronoUnit.DAYS.between(timestamp, LocalDateTime.now());
-        return days + " day" + (days != 1 ? "s" : "") + " ago";
     }
 
     private JLabel createImageLabel(String imagePath) {

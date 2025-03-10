@@ -68,6 +68,9 @@ public class InstagramProfileUI extends BaseUI {
     private void initializeUI() {
         getContentPane().removeAll(); // Clear existing components
 
+        // Initialize the following count by reading from following.txt
+        updateFollowingCount();
+        
         // Créer les panels s'ils sont null
         if (headerPanel == null) {
             headerPanel = createHeaderPanel();
@@ -86,6 +89,33 @@ public class InstagramProfileUI extends BaseUI {
 
         revalidate();
         repaint();
+    }
+
+    private void updateFollowingCount() {
+        // Read the following.txt file to count how many users the current user is following
+        Path followingFilePath = Paths.get("data", "following.txt");
+        int followingCount = 0;
+        
+        try {
+            if (Files.exists(followingFilePath)) {
+                try (BufferedReader reader = Files.newBufferedReader(followingFilePath)) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        String[] parts = line.split(":");
+                        if (parts.length > 1 && parts[0].trim().equals(currentUser.getUsername())) {
+                            // Count the followed users (separated by semicolons)
+                            String[] followedUsers = parts[1].split(";");
+                            followingCount = followedUsers.length;
+                            break;
+                        }
+                    }
+                }
+            }
+            // Update the user's following count
+            currentUser.setFollowingCount(followingCount);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private JPanel createHeaderPanel() {

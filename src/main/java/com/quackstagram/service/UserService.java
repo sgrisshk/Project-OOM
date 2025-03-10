@@ -26,7 +26,7 @@ public class UserService implements UserServiceInterface {
             String line;
             while((line = reader.readLine()) != null){
                 if (line.trim().isEmpty()) {
-                    continue; // Skip empty lines
+                    continue; 
                 }
                 
                 String[] credentials = line.split(":");
@@ -34,9 +34,7 @@ public class UserService implements UserServiceInterface {
                     String username = credentials[0];
                     String bio = credentials.length > 2 ? credentials[2] : "";
                     String password = credentials.length > 1 ? credentials[1] : "";
-                    
-                    // Create user with full info if available
-                    User user = new User(username, bio, password);
+                     User user = new User(username, bio, password);
                     users.add(user);
                 }
             }
@@ -63,17 +61,17 @@ public class UserService implements UserServiceInterface {
         }
         return null;
     }
+    
     public String getPassword(String username) throws IOException {
         try (BufferedReader reader = new BufferedReader(new FileReader(credentialsFilePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] credentials = line.split(":");
                 if (credentials.length > 0 && credentials[0].equals(username)) {
-                    // Make sure there's actually a password at index 1
                     if (credentials.length > 1) {
                         return credentials[1];
                     } else {
-                        return ""; // Return empty string if no password set
+                        return ""; 
                     }
                 }
             }
@@ -82,7 +80,6 @@ public class UserService implements UserServiceInterface {
     }
     
     public void changePassword(String username, String newPassword) {
-        // Get existing user with all their data
         User user = getUserByUsername(username);
         if (user == null) {
             throw new IllegalArgumentException("User not found");
@@ -90,17 +87,13 @@ public class UserService implements UserServiceInterface {
         
         // Create updated user with same bio but new password
         User updatedUser = new User(username, user.getBio(), newPassword);
-        
-        // Use saveUser to persist the changes
         saveUser(updatedUser);
     }
 
     public void saveUser(User user) {
         List<String> lines = new ArrayList<>();
         boolean updated = false;
-        
-        //Read existing users
-        try (BufferedReader reader = new BufferedReader(new FileReader(credentialsFilePath))) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(credentialsFilePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(":");
@@ -122,7 +115,7 @@ public class UserService implements UserServiceInterface {
             lines.add(user.toString());
         }
         
-        // Write all users back
+        // Write all users back using the principle
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(credentialsFilePath))) {
             for (String line : lines) {
                 writer.write(line);
@@ -135,7 +128,6 @@ public class UserService implements UserServiceInterface {
     
     @Override
     public User registerUser(String username, String password, String bio) {
-        // Check if username already exists
         try{
             userExists(username);
         }
@@ -143,10 +135,8 @@ public class UserService implements UserServiceInterface {
             throw new IllegalArgumentException("Username already exists");
         }
         try{
-            // Create new user with provided details
             User newUser = new User(username, password, bio);
             users.add(newUser); 
-            // Save user to storage (file/database)
             saveUser(newUser);
        
             return newUser;
@@ -158,12 +148,9 @@ public class UserService implements UserServiceInterface {
     
     @Override
     public User authenticateUser(String username, String password) {
-        // Check if user exists
         if (!userExists(username)) {
             throw new IllegalArgumentException("User not found");
         }
-        
-        // Check if password matches
         try {
             String storedPassword = getPassword(username);
             // Handle null or empty passwords

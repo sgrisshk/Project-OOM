@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+
 import com.quackstagram.model.User;
 
 /**
@@ -68,19 +69,17 @@ public class MessageClient implements Runnable {
     @Override
     public void run() {
         try {
-            // Connect to server
-            socket = new Socket("127.0.0.1", 9999);
+            socket = new Socket("127.0.0.1", 9999); // Local machine ip 
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             isRunning = true;
             
-            // Send username for identification
+            // Send username for debugging
             out.println(currentUser.getUsername());
             
             // Listen for messages
             String message;
             while (isRunning && (message = in.readLine()) != null) {
-                // Parse message
                 if (message.contains(": ")) {
                     String[] parts = message.split(": ", 2);
                     String sender = parts[0];
@@ -94,7 +93,7 @@ public class MessageClient implements Runnable {
             }
         } catch (java.net.ConnectException e) {
             System.out.println("Could not connect to the chat server: " + e.getMessage());
-            // Notify user that real-time chat is not available
+            // Error if no chat
         } catch (IOException e) {
             if (isRunning) {
                 System.out.println("Connection to chat server lost: " + e.getMessage());

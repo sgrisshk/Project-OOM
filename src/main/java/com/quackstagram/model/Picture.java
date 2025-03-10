@@ -4,9 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Représente une image publiée par un utilisateur
- */
+//Image Model
+
 public class Picture {
     private String filePath;
     private String caption;
