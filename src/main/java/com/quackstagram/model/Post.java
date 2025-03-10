@@ -1,6 +1,7 @@
 package com.quackstagram.model;
 import java.time.LocalDateTime;
 
+// Represents a social media post with an image, description, and likes.
 public class Post {
     private String id;
     private String username;
@@ -73,7 +74,7 @@ public class Post {
             if (description != null) {
                 finalDescription = description;
             }
-            
+
             return new Post(id, username, finalDescription, imagePath, likes, createdAt);
         }
     }
@@ -112,10 +113,12 @@ public class Post {
         isLiked = liked;
     }
 
+    // Increases the like count by one.
     public void incrementLikes() {
         likes++;
     }
 
+    // Decreases the like count by one, ensuring it does not go below zero.
     public void decrementLikes() {
         if (likes > 0) {
             likes--;
@@ -124,7 +127,7 @@ public class Post {
 
     @Override
     public String toString() {
-        return String.format("Post{id='%s', username='%s', description='%s', likes=%d}", 
+        return String.format("Post{id='%s', username='%s', description='%s', likes=%d}",
             id, username, description, likes);
     }
 
@@ -135,4 +138,4 @@ public class Post {
         Post post = (Post) o;
         return id.equals(post.id);
     }
-} 
+}

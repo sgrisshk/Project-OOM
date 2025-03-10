@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.quackstagram.service.MessageService;
 
-// Represents a user on Quackstagram
+// Represents a user in the Quackstagram application.
 public class User {
     private String username;
     private String bio;
@@ -50,6 +50,7 @@ public class User {
         postsCount++;
     }
 
+    // Sends a message to another user and stores it in both users' message histories.
     public void sendMessage(User receiver, String content) {
         Message message = MessageService.saveMessage(this, receiver, content);
         if (message != null) {
@@ -57,15 +58,16 @@ public class User {
             receiver.receiveMessage(message);
         }
     }
-        public void receiveMessage(Message message) {
+
+    public void receiveMessage(Message message) {
         receivedMessages.add(message);
     }
-    
-    // Get all messages between this user and another user
+
+    // Retrieves the message history between this user and another user.
     public List<Message> getConversationWith(User otherUser) {
         return MessageService.getConversation(this, otherUser);
     }
-    // Getter Setter Methods
+
     public List<Message> getSentMessages() { return sentMessages; }
     public List<Message> getReceivedMessages() { return receivedMessages; }
     public String getUsername() { return username; }
@@ -76,20 +78,19 @@ public class User {
     public int getFollowingCount() { return followingCount; }
     public List<Picture> getPictures() { return pictures; }
     public void setFollowersCount(int followersCount) { this.followersCount = followersCount; }
-   public void setFollowingCount(int followingCount) { this.followingCount = followingCount; }
-   public void setPostCount(int postCount) { this.postsCount = postCount;}
-@Override
-public String toString() {
-    return username + ":" + password + ":" + bio; 
-}
+    public void setFollowingCount(int followingCount) { this.followingCount = followingCount; }
+    public void setPostCount(int postCount) { this.postsCount = postCount;}
 
-@Override
-public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null || getClass() != obj.getClass()) return false;
-    User otherUser = (User) obj;
-    return username != null && username.equals(otherUser.username);
-}
+    @Override
+    public String toString() {
+        return username + ":" + password + ":" + bio;
+    }
 
-
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        User otherUser = (User) obj;
+        return username != null && username.equals(otherUser.username);
+    }
 }

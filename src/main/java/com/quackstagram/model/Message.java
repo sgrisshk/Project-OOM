@@ -2,8 +2,7 @@ package com.quackstagram.model;
 
 import java.time.LocalDateTime;
 
-//This is a message between two users
- 
+// Represents a chat message exchanged between two users.
 public class Message {
     private User sender;
     private User receiver;
@@ -11,7 +10,7 @@ public class Message {
     private LocalDateTime timestamp;
     private boolean read = false;
     private String messageId;
-    
+
     public Message(User sender, User receiver, String content) {
         this.sender = sender;
         this.receiver = receiver;
@@ -19,43 +18,43 @@ public class Message {
         this.timestamp = LocalDateTime.now();
         this.messageId = generateMessageId();
     }
-    
+
+    // Generates a unique message ID using sender, receiver, and timestamp.
     private String generateMessageId() {
-        //  Infos du message
         return sender.getUsername() + "_" + receiver.getUsername() + "_" + timestamp.toString().replace(":", "-");
     }
-    
+
     public String getMessageId() {
         return messageId;
     }
-    
+
     public User getSender() {
         return sender;
     }
-    
+
     public User getReceiver() {
         return receiver;
     }
-    
+
     public String getContent() {
         return content;
     }
-    
+
     public LocalDateTime getTimestamp() {
         return timestamp;
     }
-    
+
     public boolean isRead() {
         return read;
     }
-    
+
     public void setRead(boolean read) {
         this.read = read;
     }
-    
+
     @Override
     public String toString() {
-        return String.format("[%s] %s -> %s: %s", 
+        return String.format("[%s] %s -> %s: %s",
                 timestamp, sender.getUsername(), receiver.getUsername(), content);
     }
-} 
+}

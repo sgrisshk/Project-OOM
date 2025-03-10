@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 
+// UI for displaying user notifications
 public class NotificationsUI extends NavigateUI {
 
     public NotificationsUI() {
@@ -27,6 +28,7 @@ public class NotificationsUI extends NavigateUI {
         initializeUI();
     }
 
+    // Initializes the UI components for displaying notifications
     private void initializeUI() {
         JPanel headerPanel = createHeaderPanel("Notifications");
         JPanel navigationPanel = createNavigationPanel();
@@ -58,7 +60,7 @@ public class NotificationsUI extends NavigateUI {
                     foundNotifications = true;
                 }
             }
-            
+
             if (!foundNotifications) {
                 JLabel noNotificationsLabel = new JLabel("No notifications yet");
                 noNotificationsLabel.setFont(new Font("SansSerif", Font.ITALIC, 14));
@@ -81,6 +83,7 @@ public class NotificationsUI extends NavigateUI {
         add(navigationPanel, BorderLayout.SOUTH);
     }
 
+    // Adds a notification entry to the panel
     private void addNotificationToPanel(JPanel contentPanel, String[] parts) {
         String userWhoLiked = parts[1].trim();
         String imageId = parts[2].trim();
@@ -108,6 +111,7 @@ public class NotificationsUI extends NavigateUI {
         contentPanel.repaint();
     }
 
+    // Computes the time elapsed since the notification was received
     private String getElapsedTime(String timestamp) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime timeOfNotification = LocalDateTime.parse(timestamp, formatter);

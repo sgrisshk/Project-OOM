@@ -8,6 +8,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+// Abstract class providing common authentication UI components
 public abstract class AuthUI extends BaseUI {
     protected JTextField txtUsername;
     protected JPasswordField txtPassword;
@@ -22,7 +23,8 @@ public abstract class AuthUI extends BaseUI {
     }
 
 
-    
+
+    // Initializes the authentication UI with optional bio and photo upload fields
     protected void initializeUI(boolean hasBio,
                               boolean hasPhotoUpload,
                               String primaryButtonText,
@@ -34,11 +36,11 @@ public abstract class AuthUI extends BaseUI {
                               ActionListener tertiaryAction) {
 
         JPanel mainPanel = componentFactory.createPanel(20);
-        
+
         // Add logo
         mainPanel.add(componentFactory.createLogo("img/logos/QuackstagramLogoTemp.png", 100, 120));
         mainPanel.add(Box.createVerticalStrut(30));
-        
+
         // Add input fields
         JPanel fieldsPanel = new JPanel();
         fieldsPanel.setLayout(new BoxLayout(fieldsPanel, BoxLayout.Y_AXIS));
@@ -47,11 +49,11 @@ public abstract class AuthUI extends BaseUI {
         // Initialize fields
         txtUsername = new JTextField();
         txtPassword = new JPasswordField();
-        
+
         // Setup fields using component factory
         componentFactory.setupTextField(txtUsername, "Username", FIELD_SIZE);
         componentFactory.setupPasswordField(txtPassword, "Password", FIELD_SIZE);
-        
+
         fieldsPanel.add(txtUsername);
         fieldsPanel.add(Box.createVerticalStrut(15));
         fieldsPanel.add(txtPassword);
@@ -64,7 +66,7 @@ public abstract class AuthUI extends BaseUI {
         }
 
         if (hasPhotoUpload) {
-     
+
             // Upload button
             btnUploadPhoto = new JButton("Upload Photo");
             btnUploadPhoto.addActionListener(e -> handleProfilePictureUpload());
@@ -76,7 +78,7 @@ public abstract class AuthUI extends BaseUI {
         }
 
         mainPanel.add(fieldsPanel);
-        
+
         if (tertiaryButtonText != null && tertiaryAction != null) {
             mainPanel.add(componentFactory.createButtonPanel(
                 new ButtonConfig(primaryButtonText, PRIMARY_COLOR, Color.WHITE, primaryAction),
@@ -94,6 +96,7 @@ public abstract class AuthUI extends BaseUI {
         add(mainPanel, BorderLayout.CENTER);
     }
 
+    // Handles the profile picture upload process
     private void handleProfilePictureUpload() {
         JFileChooser fileChooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Image files", ImageIO.getReaderFileSuffixes());
@@ -101,7 +104,7 @@ public abstract class AuthUI extends BaseUI {
         if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
             saveProfilePicture(selectedFile, txtUsername.getText());
-            
+
             // Update preview
             ImageIcon newIcon = new ImageIcon(selectedFile.getPath());
             lblPhoto.setIcon(new ImageIcon(newIcon.getImage()
@@ -109,6 +112,7 @@ public abstract class AuthUI extends BaseUI {
         }
     }
 
+    // Saves the uploaded profile picture to the specified storage path
     private void saveProfilePicture(File file, String username) {
         try {
             BufferedImage image = ImageIO.read(file);

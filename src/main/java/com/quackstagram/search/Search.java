@@ -6,13 +6,18 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+// Abstract base class for search functionality
 public abstract class Search {
+    // Stores the search query
     protected String search;
+    // Stores search results
     public ArrayList<String> ret = new ArrayList();
 
+    // Default constructor
     public Search() {
     }
 
+    // Reads a file and processes each line through found() method
     public void findSearchText(String searchText, String file) {
         try {
             String line;
@@ -29,6 +34,7 @@ public abstract class Search {
         }
     }
 
+    // Checks if searchText already exists in ret list
     public boolean checkToAdd(String searchText) {
         for(int i = 0; i < this.ret.size(); ++i) {
             if (((String)this.ret.get(i)).equals(searchText)) {
@@ -39,5 +45,6 @@ public abstract class Search {
         return false;
     }
 
+    // Abstract method to handle found search results
     public abstract void found(String var1);
 }

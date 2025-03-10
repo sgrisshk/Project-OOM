@@ -1,3 +1,4 @@
+// Handles client-side networking, connecting to the server and sending/receiving messages
 package com.quackstagram.network;
 
 import java.io.BufferedReader;
@@ -13,6 +14,7 @@ public class Client implements Runnable{
     @Override
     public void run(){
         try{
+            // Establishes a connection to the server at 127.0.0.1 on port 9999
             socket = new Socket( "127.0.0.1", 9999);
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -25,14 +27,14 @@ public class Client implements Runnable{
             @Override
             public void run(){
                 try{
+                    // Reads user input from the console for sending messages
                     BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
                     String message;
                     // Add code to handle input
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }   
+            }
         }
     }
-}   
-
+}

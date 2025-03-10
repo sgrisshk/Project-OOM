@@ -13,8 +13,7 @@ import com.quackstagram.view.InstagramProfileUI;
 import com.quackstagram.view.NotificationsUI;
 import com.quackstagram.view.QuakstagramHomeUI;
 
-// Utilitaire pour la navigation entre écrans
- 
+// Utility class for screen navigation within the application
 public class NavigationUtils {
     private NavigationUtils() {}
 
@@ -53,4 +52,4 @@ public class NavigationUtils {
         }
         return nextScreen;
     }
-} 
+}

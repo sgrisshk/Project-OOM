@@ -1,5 +1,6 @@
 package com.quackstagram.network;
 
+// Server class handling client connections and message forwarding
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -25,6 +26,7 @@ public class Server implements Runnable {
         pool = Executors.newCachedThreadPool();
     }
 
+    // Starts the server and listens for incoming client connections
     @Override
     public void run() {
         try {
@@ -46,7 +48,7 @@ public class Server implements Runnable {
 
     private ConnectionHandler findHandler(String username) {
         for (ConnectionHandler handler : connections) {
-            if (handler.connectedUser != null && 
+            if (handler.connectedUser != null &&
                 handler.connectedUser.getUsername().equals(username)) {
                 return handler;
             }
@@ -54,6 +56,7 @@ public class Server implements Runnable {
         return null;
     }
 
+    // Sends a direct message from one user to another if the recipient is connected
     public void sendDirectMessage(String from, String to, String content) {
         ConnectionHandler receiver = findHandler(to);
         if (receiver != null) {
@@ -76,8 +79,7 @@ public class Server implements Runnable {
             try {
                 out = new PrintWriter(client.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-                
-                // First message is the username
+
                 String username = in.readLine();
                 UserService userService = new UserService();
                 try {
@@ -94,8 +96,7 @@ public class Server implements Runnable {
                     if (message.startsWith("/quit")) {
                         break;
                     }
-                    
-                    // Message format: receiver|content
+
                     String[] parts = message.split("\\|", 2);
                     if (parts.length == 2) {
                         String receiver = parts[0];
@@ -126,10 +127,10 @@ public class Server implements Runnable {
         }
     }
 
+    // Gracefully shuts down the server, closing all connections and the thread pool
     public void shutdown() {
         isRunning = false;
         try {
-            // Check if connections list exists and handle each connection safely
             if (connections != null) {
                 for (ConnectionHandler connection : new ArrayList<>(connections)) {
                     if (connection != null) {
@@ -142,13 +143,11 @@ public class Server implements Runnable {
                     }
                 }
             }
-            
-            // Check if server exists before closing
+
             if (server != null && !server.isClosed()) {
                 server.close();
             }
-            
-            // Shutdown thread pool
+
             if (pool != null) {
                 pool.shutdown();
             }

@@ -4,15 +4,14 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-//Image Model
-
+// Represents an image posted by a user, including its metadata such as caption, owner, and likes.
 public class Picture {
     private String filePath;
     private String caption;
     private LocalDateTime timestamp;
     private User owner;
     private List<String> likedBy;
-    
+
     public Picture(String filePath, String caption, User owner) {
         this.filePath = filePath;
         this.caption = caption;
@@ -20,27 +19,28 @@ public class Picture {
         this.timestamp = LocalDateTime.now();
         this.likedBy = new ArrayList<>();
     }
-    
+
     public String getFilePath() {
         return filePath;
     }
-    
+
     public String getCaption() {
         return caption;
     }
-    
+
     public LocalDateTime getTimestamp() {
         return timestamp;
     }
-    
+
     public User getOwner() {
         return owner;
     }
-    
+
     public int getLikesCount() {
         return likedBy.size();
     }
-    
+
+    // Adds a like from a user if they haven't already liked the picture.
     public void addLike(String username) {
         if (!likedBy.contains(username)) {
             likedBy.add(username);

@@ -29,7 +29,6 @@ public class ImageUploadUI extends NavigateUI {
 
         initializeUI();
 
-
         setVisible(true);
     }
 
@@ -65,9 +64,11 @@ public class ImageUploadUI extends NavigateUI {
         captionTextArea.setFont(new Font("SansSerif", Font.PLAIN, 13));
         captionTextArea.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        // Handle placeholder text behavior in the caption field
         captionTextArea.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
+                // Clear placeholder text when the user clicks the field
                 if (captionTextArea.getText().equals("Enter a caption")) {
                     captionTextArea.setText("");
                     captionTextArea.setForeground(Color.BLACK);
@@ -76,6 +77,7 @@ public class ImageUploadUI extends NavigateUI {
 
             @Override
             public void focusLost(FocusEvent e) {
+                // Restore placeholder text if the field is empty
                 if (captionTextArea.getText().trim().isEmpty()) {
                     captionTextArea.setText("Enter a caption");
                     captionTextArea.setForeground(Color.GRAY);
@@ -91,7 +93,6 @@ public class ImageUploadUI extends NavigateUI {
         styleButton(chooseImageButton);
         chooseImageButton.addActionListener(this::chooseImageAction);
         chooseImageButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-
 
         publishButton = new JButton("Publish");
         styleButton(publishButton);
@@ -130,7 +131,6 @@ public class ImageUploadUI extends NavigateUI {
             updateImagePreview(selectedFile);
         }
     }
-
 
     private void publishAction(ActionEvent event) {
         if (selectedFile == null) {
@@ -179,13 +179,11 @@ public class ImageUploadUI extends NavigateUI {
         }
     }
 
-
     private void updateImagePreview(File file) {
         ImageIcon imageIcon = new ImageIcon(file.getAbsolutePath());
 
         int labelWidth = imagePreviewLabel.getWidth();
         int labelHeight = imagePreviewLabel.getHeight();
-
 
         if (labelWidth > 0 && labelHeight > 0) {
             Image originalImage = imageIcon.getImage();
@@ -208,7 +206,6 @@ public class ImageUploadUI extends NavigateUI {
         repaint();
     }
 
-
     private void styleButton(JButton button) {
         button.setFocusPainted(false);
         button.setFont(new Font("SansSerif", Font.PLAIN, 13));
@@ -219,7 +216,6 @@ public class ImageUploadUI extends NavigateUI {
         button.setUI(new RoundedButtonUI(10));
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }
-
 
     private JPanel createHeaderPanel() {
         JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -259,7 +255,6 @@ public class ImageUploadUI extends NavigateUI {
         return maxId + 1;
     }
 
-
     private void saveImageInfo(String imageId, String username, String bio) throws IOException {
         Path infoFilePath = Paths.get("img", "image_details.txt");
         if (!Files.exists(infoFilePath)) {
@@ -281,7 +276,6 @@ public class ImageUploadUI extends NavigateUI {
         }
         return name.substring(lastIndexOf + 1);
     }
-
 
     private static class RoundedButtonUI extends javax.swing.plaf.basic.BasicButtonUI {
         private final int radius;

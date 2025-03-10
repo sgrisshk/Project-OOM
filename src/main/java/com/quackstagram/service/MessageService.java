@@ -84,18 +84,18 @@ public class MessageService {
         }
     }
     
-    // Enregistre un nouveau message
+    // Saves a new message
     public static Message saveMessage(User sender, User receiver, String content) {
         if (content == null || content.trim().isEmpty()) {
             return null;
         }
-        
+
         Message message = new Message(sender, receiver, content);
         allMessages.add(message);
         return message;
     }
-    
-    // Récupère la conversation entre deux utilisateurs
+
+    // Retrieves the conversation between two users
 
     public static List<Message> getConversation(User user1, User user2) {
         // Gets the chat between two users
