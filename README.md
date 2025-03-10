@@ -95,10 +95,10 @@ git clone https://github.com/sgrisshk/Project-OOM.git
 ### 💻 **Running**
 To run this code insert these commands into your terminal:
 ```bash
-javac SignInUI.java
+javac -d out src/main/java/com/quackstagram/view/SignInUI.java
 ```
 ```bash
-java SignInUI
+java -cp out/production/Project-OOM com.quackstagram.view.SignInUI
 ```
 
 ---
