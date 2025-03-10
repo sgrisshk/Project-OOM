@@ -8,8 +8,6 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Image;
-import java.awt.LayoutManager;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -84,24 +82,17 @@ public class QuakstagramHomeUI extends BaseUI {
         // message button to open DMs
         JButton messageButton = createIconButton("img/icons/message.png");
         messageButton.addActionListener(e -> {
-            // get current user and show their messages
             String username = com.quackstagram.util.UserSession.getInstance().getCurrentUsername();
             MessageUI.showMessagesFor(new User(username));
         });
 
-        // create the header with app name
         JPanel headerPanel = createHeaderPanel("Quackstagram");
-        
-        // make it blue like Instagram
         headerPanel.setBackground(QuackstagramStyles.HEADER_COLOR);
         headerPanel.setForeground(Color.WHITE);
         
-        // fix layout issues - had problems with this before
         headerPanel.setLayout(new BorderLayout());
-        
-        // Add title in center with duck emoji lol
         JLabel titleLabel = new JLabel("Quackstagram 🐥", JLabel.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));  // bigger font for title
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
         titleLabel.setForeground(Color.WHITE);
         headerPanel.add(titleLabel, BorderLayout.CENTER);
         
@@ -276,18 +267,9 @@ public class QuakstagramHomeUI extends BaseUI {
             BufferedImage originalImage = ImageIO.read(new File(post.getImagePath()));
             int displayWidth = QuackstagramStyles.WIDTH - 40;
             int displayHeight = QuackstagramStyles.HEIGHT - 200;
-            double aspectRatio = (double) originalImage.getWidth() / originalImage.getHeight();
             
-            int scaledWidth, scaledHeight;
-            if (displayWidth / aspectRatio <= displayHeight) {
-                scaledWidth = displayWidth;
-                scaledHeight = (int) (displayWidth / aspectRatio);
-            } else {
-                scaledHeight = displayHeight;
-                scaledWidth = (int) (displayHeight * aspectRatio);
-            }
-            
-            Image scaledImage = originalImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
+            // Use the BaseUI scaleImage method
+            BufferedImage scaledImage = scaleImage(originalImage, displayWidth, displayHeight);
             fullImageLabel.setIcon(new ImageIcon(scaledImage));
         } catch (IOException ex) {
             fullImageLabel.setText("Image not found");
@@ -338,60 +320,6 @@ public class QuakstagramHomeUI extends BaseUI {
         JPanel buttonPanel = wrapInFlowPanel(likeButton, QuackstagramStyles.BACKGROUND_COLOR, FlowLayout.LEFT);
         buttonPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         infoPanel.add(buttonPanel);
-    }
-
-    private JLabel createStyledLabel(String text, Font font, Color color, float alignment) {
-        JLabel label = new JLabel(text);
-        label.setFont(font);
-        label.setForeground(color);
-        label.setAlignmentX(alignment);
-        return label;
-    }
-
-    private JPanel createStyledPanel(LayoutManager layout, Color background) {
-        JPanel panel = new JPanel(layout);
-        panel.setBackground(background);
-        return panel;
-    }
-
-    private JPanel wrapInFlowPanel(Component component, Color background, int alignment) {
-        JPanel panel = createStyledPanel(new FlowLayout(alignment), background);
-        panel.add(component);
-        return panel;
-    }
-
-    private BufferedImage scaleImage(BufferedImage original, int targetWidth, int targetHeight) {
-        double aspectRatio = (double) original.getWidth() / original.getHeight();
-        int scaledWidth, scaledHeight;
-        
-        if (targetWidth / aspectRatio <= targetHeight) {
-            scaledWidth = targetWidth;
-            scaledHeight = (int) (targetWidth / aspectRatio);
-        } else {
-            scaledHeight = targetHeight;
-            scaledWidth = (int) (targetHeight * aspectRatio);
-        }
-        
-        Image scaled = original.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
-        BufferedImage result = new BufferedImage(scaledWidth, scaledHeight, BufferedImage.TYPE_INT_ARGB);
-        result.getGraphics().drawImage(scaled, 0, 0, null);
-        return result;
-    }
-
-    protected JButton createIconButton(String iconPath) {
-        ImageIcon iconOriginal = new ImageIcon(iconPath);
-        Image iconScaled = iconOriginal.getImage().getScaledInstance(QuackstagramStyles.NAV_ICON_SIZE, QuackstagramStyles.NAV_ICON_SIZE, Image.SCALE_SMOOTH);
-        JButton button = new JButton(new ImageIcon(iconScaled));
-        button.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
-        button.setContentAreaFilled(false);
-        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        return button;
-    }
-
-    protected JButton createIconButton(String iconPath, String buttonType) {
-        JButton button = createIconButton(iconPath);
-        button.addActionListener(e -> navigateToScreen(buttonType));
-        return button;
     }
 
     @Override

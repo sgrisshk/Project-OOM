@@ -12,8 +12,8 @@ import com.quackstagram.model.User;
 
 public class UserService implements UserServiceInterface {
     private List<User> users;
-    private String credentialsFilePath = "data/credentials.txt";
-    private String followingFilePath = "data/following.txt";
+    private static final String CREDENTIALS_FILE_PATH = "data/credentials.txt";
+    private static final String FOLLOWING_FILE_PATH = "data/following.txt";
     
     // Constructor
     public UserService() {
@@ -23,7 +23,7 @@ public class UserService implements UserServiceInterface {
 
     public void loadUsers() {
         try { 
-            BufferedReader reader = new BufferedReader(new FileReader(credentialsFilePath));
+            BufferedReader reader = new BufferedReader(new FileReader(CREDENTIALS_FILE_PATH));
             String line;
             while((line = reader.readLine()) != null){
                 if (line.trim().isEmpty()) {
@@ -64,7 +64,7 @@ public class UserService implements UserServiceInterface {
     }
     
     public String getPassword(String username) throws IOException {
-        try (BufferedReader reader = new BufferedReader(new FileReader(credentialsFilePath))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(CREDENTIALS_FILE_PATH))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] credentials = line.split(":");
@@ -94,7 +94,7 @@ public class UserService implements UserServiceInterface {
     public void saveUser(User user) {
         List<String> lines = new ArrayList<>();
         boolean updated = false;
-            try (BufferedReader reader = new BufferedReader(new FileReader(credentialsFilePath))) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(CREDENTIALS_FILE_PATH))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(":");
@@ -108,7 +108,7 @@ public class UserService implements UserServiceInterface {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error saving user: ");
+            System.out.println("Error saving user: " + e.getMessage());
         }
         
         //Add user if not updated
@@ -117,18 +117,18 @@ public class UserService implements UserServiceInterface {
         }
         
         // Write all users back using the principle
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(credentialsFilePath))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(CREDENTIALS_FILE_PATH))) {
             for (String line : lines) {
                 writer.write(line);
                 writer.newLine();
             }
         } catch (IOException e) {
-            System.out.println("Error saving user: ");
+            System.out.println("Error saving user: " + e.getMessage());
         }
     }
     
     private void initializeFollowingEntry(String username) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(followingFilePath, true))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FOLLOWING_FILE_PATH, true))) {
             writer.write(username + ":");  // Initialize with empty following list
             writer.newLine();
         } catch (IOException e) {
@@ -181,7 +181,7 @@ public class UserService implements UserServiceInterface {
             List<String> lines = new ArrayList<>();
             boolean updated = false;
             
-            try (BufferedReader reader = new BufferedReader(new FileReader(followingFilePath))) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(FOLLOWING_FILE_PATH))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     if (line.startsWith(follower + ":")) {
@@ -208,7 +208,7 @@ public class UserService implements UserServiceInterface {
             }
             
             // Write back all relationships
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(followingFilePath))) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(FOLLOWING_FILE_PATH))) {
                 for (String line : lines) {
                     writer.write(line);
                     writer.newLine();
@@ -221,7 +221,7 @@ public class UserService implements UserServiceInterface {
 
     public List<String> getFollowing(String username) {
         List<String> following = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(followingFilePath))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(FOLLOWING_FILE_PATH))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith(username + ":")) {
@@ -248,7 +248,7 @@ public class UserService implements UserServiceInterface {
 
     public int getFollowerCount(String username) {
         int followerCount = 0;
-        try (BufferedReader reader = new BufferedReader(new FileReader(followingFilePath))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(FOLLOWING_FILE_PATH))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(":");

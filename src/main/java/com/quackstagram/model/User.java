@@ -57,7 +57,8 @@ public class User {
             receiver.receiveMessage(message);
         }
     }
-        public void receiveMessage(Message message) {
+    
+    public void receiveMessage(Message message) {
         receivedMessages.add(message);
     }
     
@@ -65,31 +66,31 @@ public class User {
     public List<Message> getConversationWith(User otherUser) {
         return MessageService.getConversation(this, otherUser);
     }
+    
     // Getter Setter Methods
     public List<Message> getSentMessages() { return sentMessages; }
     public List<Message> getReceivedMessages() { return receivedMessages; }
     public String getUsername() { return username; }
     public String getBio() { return bio; }
-    public void setBio(String bio) {this.bio = bio; }
+    public void setBio(String bio) { this.bio = bio; }
     public int getPostsCount() { return postsCount; }
     public int getFollowersCount() { return followersCount; }
     public int getFollowingCount() { return followingCount; }
     public List<Picture> getPictures() { return pictures; }
     public void setFollowersCount(int followersCount) { this.followersCount = followersCount; }
-   public void setFollowingCount(int followingCount) { this.followingCount = followingCount; }
-   public void setPostCount(int postCount) { this.postsCount = postCount;}
-@Override
-public String toString() {
-    return username + ":" + password + ":" + bio; 
-}
+    public void setFollowingCount(int followingCount) { this.followingCount = followingCount; }
+    public void setPostCount(int postCount) { this.postsCount = postCount; }
+    
+    @Override
+    public String toString() {
+        return username + ":" + password + ":" + bio; 
+    }
 
-@Override
-public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null || getClass() != obj.getClass()) return false;
-    User otherUser = (User) obj;
-    return username != null && username.equals(otherUser.username);
-}
-
-
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        User otherUser = (User) obj;
+        return username != null && username.equals(otherUser.username);
+    }
 }

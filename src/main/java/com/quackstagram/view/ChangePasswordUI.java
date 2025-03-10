@@ -1,10 +1,16 @@
 package com.quackstagram.view;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 
-import com.quackstagram.model.User;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+
 import com.quackstagram.service.UserService;
 
 public class ChangePasswordUI extends BaseUI {
@@ -15,15 +21,11 @@ public class ChangePasswordUI extends BaseUI {
     private final JPasswordField txtCurrentPassword;
     private final JPasswordField txtNewPassword;
     private final JPasswordField txtConfirmPassword;
-    private final User currentUser;
-    private final boolean isLoggedIn;
     
     // Constructor
     public ChangePasswordUI() {
         super("Quackstagram - Change Password");
         this.userService = new UserService();
-        this.currentUser = null;
-        this.isLoggedIn = false;
         this.txtUsername = new JTextField();
         this.txtCurrentPassword = new JPasswordField();
         this.txtNewPassword = new JPasswordField();

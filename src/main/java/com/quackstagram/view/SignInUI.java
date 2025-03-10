@@ -11,7 +11,6 @@ import com.quackstagram.util.UserSession;
 
 public class SignInUI extends AuthUI {
     private static final Color PRIMARY_COLOR = new Color(255, 90, 95);
-    private static final Color SECONDARY_COLOR = new Color(51, 51, 51);
     
     private final UserService userService;
 

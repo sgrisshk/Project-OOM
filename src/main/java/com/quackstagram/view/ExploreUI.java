@@ -52,14 +52,34 @@ public class ExploreUI extends BaseUI {
     }
 
     private JPanel createMainContentPanel(Search filter) {
-        // Search bar at the top
         JPanel searchPanel = new JPanel(new BorderLayout());
-        JTextField searchField = new JTextField(" Search Users");
+        JTextField searchField = new JTextField("Search with @ # /");
+        searchField.setForeground(java.awt.Color.GRAY);
+        searchField.setPreferredSize(new Dimension(WIDTH / 2, 30));
+        searchPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        searchField.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                if (searchField.getText().equals("Search with @ # /")) {
+                    searchField.setText("");
+                    searchField.setForeground(java.awt.Color.BLACK);
+                }
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                if (searchField.getText().isEmpty()) {
+                    searchField.setForeground(java.awt.Color.GRAY);
+                    searchField.setText("Search with @ # /");
+                }
+            }
+        });
+        
         searchPanel.add(searchField, BorderLayout.CENTER);
         searchPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, searchField.getPreferredSize().height));
         searchField.addActionListener(e -> {
             String searchText = searchField.getText();
-            parseImageData(searchText);
+            if (!searchText.equals("Search with @ # /")) {
+                parseImageData(searchText);
+            }
         });
 
         JPanel imageGridPanel = new JPanel(new GridLayout(0, 3, 2, 2));
@@ -69,6 +89,12 @@ public class ExploreUI extends BaseUI {
             File[] imageFiles = imageDir.listFiles((dir, name) -> name.matches(".*\\.(png|jpg|jpeg)"));
             if (imageFiles != null) {
                 for (File imageFile : imageFiles) {
+                    String imageId = imageFile.getName().split("\\.")[0];
+                    // Only show images that match the filter if a filter is present
+                    if (filter != null && !filter.ret.contains(imageId)) {
+                        continue;
+                    }
+                    
                     ImageIcon imageIcon = new ImageIcon(new ImageIcon(imageFile.getPath())
                             .getImage()
                             .getScaledInstance(IMAGE_SIZE, IMAGE_SIZE, Image.SCALE_SMOOTH));
@@ -76,7 +102,6 @@ public class ExploreUI extends BaseUI {
                     imageLabel.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
-                            String imageId = imageFile.getName().split("\\.")[0];
                             displayImage(imageId);
                         }
                     });

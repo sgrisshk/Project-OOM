@@ -38,7 +38,7 @@ public class MessageUI extends JFrame {
     private JTextArea conversationArea;
     private JTextField messageField;
     private JButton sendButton;
-    private String followingPath = "data/following.txt";
+    private static final String FOLLOWING_PATH = "data/following.txt";
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
     
     public MessageUI(User currentUser) {
@@ -123,7 +123,7 @@ public class MessageUI extends JFrame {
     
     private void addContacts() {
         // Read contacts from following.txt file
-        try (BufferedReader reader = new BufferedReader(new FileReader(followingPath))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(FOLLOWING_PATH))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 // Check if the line contains the current user's username

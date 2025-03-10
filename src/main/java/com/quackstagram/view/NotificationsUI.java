@@ -114,20 +114,18 @@ public class NotificationsUI extends NavigateUI {
         LocalDateTime currentTime = LocalDateTime.now();
 
         Duration duration = Duration.between(timeOfNotification, currentTime);
-        long daysBetween = duration.toDays();
-        long minutesBetween = duration.toMinutesPart();
-
-        String timeText;
-        int timeCase = (daysBetween > 0 ? 1 : 0) + (minutesBetween > 0 ? 2 : 0);
+        long days = duration.toDays();
+        long hours = duration.toHoursPart();
+        long minutes = duration.toMinutesPart();
         
-        if (timeCase == 1) {
-            timeText = String.format("%d day%s ago", daysBetween, daysBetween > 1 ? "s" : "");
-        } else if (timeCase == 2) {
-            timeText = String.format("%d minute%s ago", minutesBetween, minutesBetween > 1 ? "s" : "");
-        } else if (timeCase == 3) {
-            timeText = String.format("%d day%s and %d minute%s ago", 
-                daysBetween, daysBetween > 1 ? "s" : "", 
-                minutesBetween, minutesBetween > 1 ? "s" : "");
+        String timeText;
+        
+        if (days > 0) {
+            timeText = String.format("%d day%s ago", days, days > 1 ? "s" : "");
+        } else if (hours > 0) {
+            timeText = String.format("%d hour%s ago", hours, hours > 1 ? "s" : "");
+        } else if (minutes > 0) {
+            timeText = String.format("%d minute%s ago", minutes, minutes > 1 ? "s" : "");
         } else {
             timeText = "just now";
         }

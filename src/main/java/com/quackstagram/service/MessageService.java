@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,7 +17,6 @@ import com.quackstagram.model.User;
 
 public class MessageService {
     private static final String MESSAGES_FILE = "data/Messages.txt";
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
     private static int nextMessageId = 1;
     
     private static List<Message> allMessages = new ArrayList<>();
@@ -84,7 +82,7 @@ public class MessageService {
         }
     }
     
-    // Enregistre un nouveau message
+    // register a new message
     public static Message saveMessage(User sender, User receiver, String content) {
         if (content == null || content.trim().isEmpty()) {
             return null;
@@ -95,17 +93,17 @@ public class MessageService {
         return message;
     }
     
-    // Récupère la conversation entre deux utilisateurs
+    // get the conversation between two users
 
     public static List<Message> getConversation(User user1, User user2) {
-        // Gets the chat between two users
+        // get the chat between two users
         return allMessages.stream()
                 .filter(m -> (m.getSender().equals(user1) && m.getReceiver().equals(user2)) || 
                              (m.getSender().equals(user2) && m.getReceiver().equals(user1)))
                 .collect(Collectors.toList());
     }
     
-    // Gets all the messages
+    // get all the messages
     public static List<Message> getAllMessages() {
         return new ArrayList<>(allMessages);
     }

@@ -10,9 +10,8 @@ import java.util.List;
 
 import com.quackstagram.model.User;
 
-/**
- * Client implementation for the messaging UI
- */
+// implementation for the messaging UI
+
 public class MessageClient implements Runnable {
     private Socket socket;
     private PrintWriter out;
@@ -31,7 +30,7 @@ public class MessageClient implements Runnable {
     }
     
     public void connect() {
-        // Ensure server is running
+        // ensure server is running
         ServerManager.getInstance().startServer();
         
         if (clientThread == null || !clientThread.isAlive()) {

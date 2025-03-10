@@ -1,7 +1,14 @@
 package com.quackstagram.view;
 
-import java.awt.*;
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JToolBar;
+
 import com.quackstagram.model.User;
 
 
@@ -46,18 +53,5 @@ public class MainAppUI extends JFrame {
     public static void startApp(User user) {
         MainAppUI app = new MainAppUI(user);
         app.setVisible(true);
-    }
-    
-    // Main method to start the application
-     
-    public static void main(String[] args) {
-        User demoUser = new User("demo_user", "This is a demo user", "password");
-        
-        User user1 = new User("user1", "User 1's bio", "pass1");
-        User user2 = new User("user2", "User 2's bio", "pass2");
-        demoUser.sendMessage(user1, "Hello User 1!");
-        user1.sendMessage(demoUser, "Hi Demo User!");
-        demoUser.sendMessage(user2, "Hey User 2, how's it going?");
-        SwingUtilities.invokeLater(() -> startApp(demoUser));
     }
 } 

@@ -13,33 +13,6 @@ public abstract class NavigateUI extends BaseUI {
         super(title);
     }
 
-    private void ImageUploadUI() {
-        // Open InstagramProfileUI frame
-        this.dispose();
-        ImageUploadUI upload = new ImageUploadUI();
-        upload.setVisible(true);
-    }
-
-    private void notificationsUI() {
-        this.dispose();
-        NotificationsUI notificationsUI = new NotificationsUI();
-        notificationsUI.setVisible(true);
-    }
-
-    private void openHomeUI() {
-        // Open InstagramProfileUI frame
-        this.dispose();
-        QuakstagramHomeUI homeUI = new QuakstagramHomeUI();
-        homeUI.setVisible(true);
-    }
-
-    private void exploreUI() {
-        // Open InstagramProfileUI frame
-        this.dispose();
-        ExploreUI explore = new ExploreUI(null);
-        explore.setVisible(true);
-    }
-
     protected String readUserNameFromFile() {
         String username = "";
         try (BufferedReader reader = Files.newBufferedReader(Paths.get("data", "users.txt"))) {

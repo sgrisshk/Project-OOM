@@ -23,7 +23,7 @@ public class ServerManager {
         if (!isServerRunning) {
             server = new Server();
             serverThread = new Thread(server);
-            serverThread.setDaemon(true); // Allow JVM to exit even if server is running
+            serverThread.setDaemon(true); 
             serverThread.start();
             isServerRunning = true;
             System.out.println("Chat server started on port 9999");

@@ -36,13 +36,13 @@ public class InstagramProfileUI extends BaseUI {
 
     private static final int WIDTH = 300;
     private static final int HEIGHT = 500;
-    private static final int PROFILE_IMAGE_SIZE = 80; // Adjusted size for the profile image to match UI
-    private static final int GRID_IMAGE_SIZE = WIDTH / 3; // Static size for grid images
-    private static final int NAV_ICON_SIZE = 20; // Corrected static size for bottom icons
-    private JPanel contentPanel; // Panel to display the image grid or the clicked image
-    private JPanel headerPanel;   // Panel for the header
-    private JPanel navigationPanel; // Panel for the navigation
-    private User currentUser; // User object to store the current user's information
+    private static final int PROFILE_IMAGE_SIZE = 80; 
+    private static final int GRID_IMAGE_SIZE = WIDTH / 3; 
+    private static final int NAV_ICON_SIZE = 20; 
+    private JPanel contentPanel; 
+    private JPanel headerPanel;
+    private JPanel navigationPanel;   
+    private User currentUser; 
 
     public InstagramProfileUI(User user) {
         super("Quackstagram - Profile");
@@ -67,7 +67,7 @@ public class InstagramProfileUI extends BaseUI {
     }
 
     private void initializeUI() {
-        getContentPane().removeAll(); // clear everything first
+        getContentPane().removeAll(); 
         
         // Need to get follower counts first
         // still working on this - fix bugs later
@@ -169,16 +169,12 @@ public class InstagramProfileUI extends BaseUI {
         JPanel statsPanel = new JPanel();
         statsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 0));
         statsPanel.setBackground(new Color(249, 249, 249));
-        System.out.println("Number of posts for this user"+currentUser.getPostsCount());
         statsPanel.add(createStatLabel(Integer.toString(currentUser.getPostsCount()) , "Posts"));
         statsPanel.add(createStatLabel(Integer.toString(currentUser.getFollowersCount()), "Followers"));
         statsPanel.add(createStatLabel(Integer.toString(currentUser.getFollowingCount()), "Following"));
         statsPanel.setBorder(BorderFactory.createEmptyBorder(25, 0, 10, 0)); // Add some vertical padding
 
 
-// Follow Button
-// Follow or Edit Profile Button
-// followButton.addActionListener(e -> handleFollowAction(currentUser.getUsername()));
         JButton followButton;
         if (isCurrentUser) {
             followButton = new JButton("Edit Profile");
@@ -239,7 +235,6 @@ public class InstagramProfileUI extends BaseUI {
         profileNameLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10)); // Padding on the sides
 
         JTextArea profileBio = new JTextArea(currentUser.getBio());
-        System.out.println("This is the bio "+currentUser.getUsername());
         profileBio.setEditable(false);
         profileBio.setFont(new Font("Arial", Font.PLAIN, 12));
         profileBio.setBackground(new Color(249, 249, 249));

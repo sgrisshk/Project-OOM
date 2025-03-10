@@ -9,11 +9,13 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.LayoutManager;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.util.function.Supplier;
 
 import javax.swing.BorderFactory;
@@ -266,5 +268,54 @@ public abstract class BaseUI extends JFrame {
         public void mouseExited(MouseEvent e) {
             ((JButton)e.getSource()).setBackground(originalColor);
         }
+    }
+
+    protected JLabel createStyledLabel(String text, Font font, Color color, float alignment) {
+        JLabel label = new JLabel(text);
+        label.setFont(font);
+        label.setForeground(color);
+        label.setAlignmentX(alignment);
+        return label;
+    }
+
+    protected JPanel createStyledPanel(LayoutManager layout, Color background) {
+        JPanel panel = new JPanel(layout);
+        panel.setBackground(background);
+        return panel;
+    }
+
+    protected JPanel wrapInFlowPanel(Component component, Color background, int alignment) {
+        JPanel panel = createStyledPanel(new FlowLayout(alignment), background);
+        panel.add(component);
+        return panel;
+    }
+
+    protected BufferedImage scaleImage(BufferedImage original, int targetWidth, int targetHeight) {
+        double aspectRatio = (double) original.getWidth() / original.getHeight();
+        int scaledWidth, scaledHeight;
+        
+        if (targetWidth / aspectRatio <= targetHeight) {
+            scaledWidth = targetWidth;
+            scaledHeight = (int) (targetWidth / aspectRatio);
+        } else {
+            scaledHeight = targetHeight;
+            scaledWidth = (int) (targetHeight * aspectRatio);
+        }
+        
+        Image scaled = original.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_SMOOTH);
+        BufferedImage result = new BufferedImage(scaledWidth, scaledHeight, BufferedImage.TYPE_INT_ARGB);
+        result.getGraphics().drawImage(scaled, 0, 0, null);
+        return result;
+    }
+
+    // Extended createIconButton method with cursor styling
+    protected JButton createIconButton(String iconPath) {
+        ImageIcon iconOriginal = new ImageIcon(iconPath);
+        Image iconScaled = iconOriginal.getImage().getScaledInstance(NAV_ICON_SIZE, NAV_ICON_SIZE, Image.SCALE_SMOOTH);
+        JButton button = new JButton(new ImageIcon(iconScaled));
+        button.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+        button.setContentAreaFilled(false);
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return button;
     }
 }
