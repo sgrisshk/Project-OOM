@@ -15,6 +15,7 @@ import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -24,12 +25,18 @@ import javax.swing.JTextField;
 import com.quackstagram.controller.PostController;
 import com.quackstagram.model.Post;
 import com.quackstagram.model.User;
+import com.quackstagram.search.Search;
+import com.quackstagram.search.SearchHashtag;
+import com.quackstagram.search.SearchName;
+import com.quackstagram.search.SearchUsersPhotos;
 
 public class ExploreUI extends BaseUI {
     private static final int IMAGE_SIZE = WIDTH / 3;
     private final PostController postController;
+    private final String credentialsFilePath ="data/credentials.txt";
+    private final String imageFilePath ="img/image_details.txt";
 
-    public ExploreUI() {
+    public ExploreUI(Search filter) {
         super("Explore");
         this.postController = PostController.getInstance();
         
@@ -37,19 +44,23 @@ public class ExploreUI extends BaseUI {
         setLayout(new BorderLayout());
 
         add(createHeaderPanel("Explore"), BorderLayout.NORTH);
-        add(createMainContentPanel(), BorderLayout.CENTER);
+        add(createMainContentPanel(filter), BorderLayout.CENTER);
         add(createNavigationPanel(), BorderLayout.SOUTH);
 
         revalidate();
         repaint();
     }
 
-    private JPanel createMainContentPanel() {
+    private JPanel createMainContentPanel(Search filter) {
         // Search bar at the top
         JPanel searchPanel = new JPanel(new BorderLayout());
         JTextField searchField = new JTextField(" Search Users");
         searchPanel.add(searchField, BorderLayout.CENTER);
         searchPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, searchField.getPreferredSize().height));
+        searchField.addActionListener(e -> {
+            String searchText = searchField.getText();
+            parseImageData(searchText);
+        });
 
         JPanel imageGridPanel = new JPanel(new GridLayout(0, 3, 2, 2));
 
@@ -84,6 +95,43 @@ public class ExploreUI extends BaseUI {
         mainContentPanel.add(scrollPane);
         return mainContentPanel;
     }
+    private void parseImageData(String searchText) {
+        char first = searchText.charAt(0);
+        searchText = searchText.substring(1);
+        if(first == '@') {
+            SearchName finduser = new SearchName(searchText);
+            finduser.findSearchText(searchText, credentialsFilePath);
+            if (!finduser.ret.isEmpty()){
+                loadProfile(finduser.ret.get(0));
+            }
+        }
+        if(first == '#') {
+            SearchHashtag findhash = new SearchHashtag(searchText);
+            findhash.findSearchText(searchText, imageFilePath);
+            JFrame newScreen=new ExploreUI(findhash);
+            if (newScreen != null) {
+                this.dispose();
+                newScreen.setVisible(true);
+            }
+
+        }
+        if(first == '/') {
+            SearchUsersPhotos findphotos = new SearchUsersPhotos(searchText);
+            findphotos.findSearchText(searchText, imageFilePath);
+            JFrame newScreen=new ExploreUI(findphotos);
+            if (newScreen != null) {
+                this.dispose();
+                newScreen.setVisible(true);
+            }
+        }
+    }
+
+    private void loadProfile(String first) {
+        User user = new User(first);
+        InstagramProfileUI profileUI = new InstagramProfileUI(user);
+        profileUI.setVisible(true);
+        dispose();
+    }
 
     private void displayImage(String imageId) {
         getContentPane().removeAll();
@@ -107,6 +155,9 @@ public class ExploreUI extends BaseUI {
         String timeSincePosting = postController.getTimeSincePosting(post);
         int likes = post.getLikes();
         String imagePath = post.getImagePath();
+        
+        // Create a final variable to use in lambda expression
+        final String finalUsername = username;
 
         // Top panel for username and time since posting
         JPanel topPanel = new JPanel(new BorderLayout());
@@ -149,17 +200,14 @@ public class ExploreUI extends BaseUI {
 
         backButton.addActionListener(e -> {
             getContentPane().removeAll();
-            add(createMainContentPanel(), BorderLayout.CENTER);
+            add(createMainContentPanel(null), BorderLayout.CENTER);
             add(createNavigationPanel(), BorderLayout.SOUTH);
             revalidate();
             repaint();
         });
 
         usernameLabel.addActionListener(e -> {
-            User user = new User(username);
-            InstagramProfileUI profileUI = new InstagramProfileUI(user);
-            profileUI.setVisible(true);
-            dispose();
+            loadProfile(finalUsername);
         });
 
         JPanel containerPanel = new JPanel(new BorderLayout());

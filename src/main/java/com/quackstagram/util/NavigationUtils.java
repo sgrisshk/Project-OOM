@@ -36,7 +36,7 @@ public class NavigationUtils {
                 nextScreen = new QuakstagramHomeUI();
                 break;
             case "explore":
-                nextScreen = new ExploreUI();
+                nextScreen = new ExploreUI(null);
                 break;
             case "upload":
                 nextScreen = new ImageUploadUI();
