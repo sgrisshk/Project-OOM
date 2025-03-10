@@ -3,8 +3,6 @@ package com.quackstagram.util;
 import javax.swing.JOptionPane;
 import java.awt.Component;
 
-//Utilitaire pour afficher des boîtes de dialogue
-
 public class DialogUtils {
     private DialogUtils() {}
 
